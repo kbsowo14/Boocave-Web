@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useSession, signIn } from 'next-auth/react'
+import Image from 'next/image'
 import axios from 'axios'
 
 type ReviewModalProps = {
@@ -42,7 +43,7 @@ export function ReviewModal({ book, onClose, onSuccess }: ReviewModalProps) {
 		}
 
 		if (!review.trim()) {
-			alert('독후감을 작성해주세요')
+			alert('이 책에 대해 요약해주세요')
 			return
 		}
 
@@ -58,16 +59,15 @@ export function ReviewModal({ book, onClose, onSuccess }: ReviewModalProps) {
 			alert('책장에 등록되었습니다! 🎉')
 			onSuccess()
 			onClose()
-		} catch (error: any) {
+		} catch (error: unknown) {
 			console.error('리뷰 저장 오류:', error)
-			alert(error.response?.data?.error || '리뷰 저장에 실패했습니다')
 		} finally {
 			setLoading(false)
 		}
 	}
 
 	return (
-		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+		<div className="fixed inset-0 bg-black/25 flex items-center justify-center p-4 z-50">
 			<div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
 				<div className="p-6">
 					{/* 헤더 */}
@@ -87,11 +87,13 @@ export function ReviewModal({ book, onClose, onSuccess }: ReviewModalProps) {
 
 					{/* 책 정보 */}
 					<div className="flex gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
-						{book.thumbnail ? (
-							<img
-								src={book.thumbnail}
-								alt={book.title}
-								className="w-20 h-28 object-cover rounded"
+						{book?.thumbnail ? (
+							<Image
+								src={book?.thumbnail}
+								alt={book?.title || ''}
+								className="object-cover rounded"
+								width={80}
+								height={112}
 							/>
 						) : (
 							<div className="w-20 h-28 bg-gray-200 rounded flex items-center justify-center">
@@ -111,9 +113,7 @@ export function ReviewModal({ book, onClose, onSuccess }: ReviewModalProps) {
 					{/* 로그인 안내 */}
 					{!session && (
 						<div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-							<p className="text-sm text-blue-800">
-								💡 독후감을 작성하려면 로그인이 필요합니다
-							</p>
+							<p className="text-sm text-blue-800">이 책을 등록하려면 로그인이 필요합니다</p>
 						</div>
 					)}
 
@@ -131,7 +131,7 @@ export function ReviewModal({ book, onClose, onSuccess }: ReviewModalProps) {
 										onMouseLeave={() => setHoveredRating(0)}
 										className="text-4xl focus:outline-none transition-transform hover:scale-110"
 									>
-										{star <= (hoveredRating || rating) ? '⭐' : '☆'}
+										{star <= (hoveredRating || rating) ? '★' : '☆'}
 									</button>
 								))}
 							</div>
@@ -139,11 +139,11 @@ export function ReviewModal({ book, onClose, onSuccess }: ReviewModalProps) {
 
 						{/* 독후감 */}
 						<div className="mb-6">
-							<label className="block text-sm font-medium text-gray-700 mb-2">독후감</label>
+							<label className="block text-sm font-medium text-gray-700 mb-2">요약</label>
 							<textarea
 								value={review}
 								onChange={e => setReview(e.target.value)}
-								rows={8}
+								rows={5}
 								placeholder="이 책을 읽고 느낀 점을 자유롭게 작성해보세요..."
 								className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
 							/>

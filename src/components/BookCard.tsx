@@ -11,7 +11,7 @@ type BookCardProps = {
 		thumbnail: string
 		isbn: string
 	}
-	onSelect: (book: any) => void
+	onSelect: (book: unknown) => void
 }
 
 export function BookCard({ book, onSelect }: BookCardProps) {

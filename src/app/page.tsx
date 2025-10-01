@@ -72,7 +72,11 @@ export default function Home() {
 						</h2>
 						<div className="grid gap-4">
 							{books.map(book => (
-								<BookCard key={book.googleId} book={book} onSelect={setSelectedBook} />
+								<BookCard
+									key={book.googleId}
+									book={book}
+									onSelect={setSelectedBook as (book: unknown) => void}
+								/>
 							))}
 						</div>
 					</div>
