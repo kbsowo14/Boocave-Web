@@ -43,7 +43,7 @@ export default function Home() {
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 				{/* 히어로 섹션 */}
 				<div className="text-center mb-12">
-					<h1 className="text-5xl font-bold text-gray-900 mb-4">📚 나만의 책장</h1>
+					<h1 className="text-5xl font-bold text-gray-900 mb-4">나만의 책장</h1>
 					<p className="text-xl text-gray-600 mb-8">
 						읽은 책을 검색하고, 독후감을 작성해보세요
 					</p>
