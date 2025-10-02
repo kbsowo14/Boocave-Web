@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import Image from 'next/image'
 
 type BookReview = {
 	id: string
@@ -76,7 +77,7 @@ export default function MyLibrary() {
 	}
 
 	return (
-		<main className="min-h-screen bg-gray-50">
+		<main className="min-h-screen">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 				<div className="mb-8">
 					<h1 className="text-4xl font-bold text-gray-900 mb-2">내 책장</h1>
@@ -105,15 +106,17 @@ export default function MyLibrary() {
 						{reviews.map(review => (
 							<div
 								key={review.id}
-								className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+								className="bg-[#333333] rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
 							>
 								{/* 책 표지 */}
-								<div className="h-64 bg-gray-100 flex items-center justify-center">
-									{review.book.thumbnail ? (
-										<img
+								<div className="h-64 bg-[#444444] flex items-center justify-center">
+									{review?.book?.thumbnail ? (
+										<Image
 											src={review.book.thumbnail}
 											alt={review.book.title}
-											className="h-full w-auto object-contain"
+											className="object-contain rounded-r-lg rounded-l-sm border-[2px] border-gray-200 shadow-md shadow-[#171717]"
+											width={100}
+											height={200}
 										/>
 									) : (
 										<div className="text-6xl">📖</div>
