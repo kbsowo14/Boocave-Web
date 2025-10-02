@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Image from 'next/image'
+import { LoadingIndicator } from '@/components/LoadingIndicator'
+import { MdOutlineImageNotSupported } from 'react-icons/md'
 
 type BookReview = {
 	id: string
@@ -66,8 +68,8 @@ export default function MyLibrary() {
 
 	if (status === 'loading' || loading) {
 		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+			<div className=" pt-20 flex justify-center items-center">
+				<LoadingIndicator />
 			</div>
 		)
 	}
@@ -77,94 +79,51 @@ export default function MyLibrary() {
 	}
 
 	return (
-		<main className="min-h-screen">
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-				<div className="mb-8">
-					<h1 className="text-4xl font-bold text-gray-900 mb-2">내 책장</h1>
-					<p className="text-gray-600">
-						총 <span className="font-semibold text-blue-600">{reviews.length}권</span>의 책을
-						읽었습니다
+		<div className="">
+			<div className="px-4">
+				<div className="py-8">
+					<p className="text-white">
+						총 <span className="font-semibold text-[#51CD42]">{reviews.length}권</span>의 책을
+						기록했어요.
 					</p>
 				</div>
 
-				{reviews.length === 0 ? (
-					<div className="text-center py-20">
-						<div className="text-6xl mb-4">📚</div>
-						<h2 className="text-2xl font-semibold text-gray-900 mb-2">
-							아직 등록된 책이 없습니다
-						</h2>
-						<p className="text-gray-600 mb-6">첫 번째 책을 검색하고 독후감을 작성해보세요!</p>
+				{reviews?.length <= 0 ? (
+					// 책이 없을 때
+					<div className="text-center py-16">
+						<div className="text-4xl mb-4">📚</div>
+						<p className="text-lg font-semibold text-white mb-1">아직 등록된 책이 없습니다</p>
+						<p className="text-white text-sm">첫 번째 책을 검색하고 리뷰를 작성해보세요!</p>
 						<button
-							onClick={() => router.push('/')}
-							className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+							onClick={() => router.push('/search')}
+							className="text-sm font-bold text-[#51CD42] rounded-lg transition-colors mt-6"
 						>
-							책 검색하기
+							추가하기 +
 						</button>
 					</div>
 				) : (
-					<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-						{reviews.map(review => (
-							<div
-								key={review.id}
-								className="bg-[#333333] rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
-							>
-								{/* 책 표지 */}
-								<div className="h-64 bg-[#444444] flex items-center justify-center">
-									{review?.book?.thumbnail ? (
-										<Image
-											src={review.book.thumbnail}
-											alt={review.book.title}
-											className="object-contain rounded-r-lg rounded-l-sm border-[2px] border-gray-200 shadow-md shadow-[#171717]"
-											width={100}
-											height={200}
-										/>
+					// 책이 있을 때
+					<div className="gap-6 w-full flex-wrap flex flex-row justify-between items-start">
+						{reviews?.map((review, index) => {
+							const { thumbnail, title } = review?.book || {}
+							return (
+								<div
+									key={index}
+									className="w-24 h-40 flex justify-center items-center rounded-r-lg rounded-l-sm overflow-hidden relative"
+								>
+									{/* 책 표지 */}
+									{thumbnail ? (
+										<Image src={thumbnail} alt={title || 'book'} width={96} height={160} />
 									) : (
-										<div className="text-6xl">📖</div>
+										<div className="bg-[#444444] w-full h-full flex justify-center items-center">
+											<MdOutlineImageNotSupported size={24} color="#fff" />
+										</div>
 									)}
+									<div className="w-[2px] h-full bg-white/20 absolute left-[10px] top-0" />
+									<div className="w-[2px] h-full bg-black/20 absolute left-[8px] top-0" />
 								</div>
-
-								{/* 책 정보 */}
-								<div className="p-6">
-									<h3 className="text-xl font-bold text-gray-900 mb-1 line-clamp-2">
-										{review.book.title}
-									</h3>
-									<p className="text-sm text-gray-600 mb-3">{review.book.author}</p>
-
-									{/* 별점 */}
-									<div className="flex items-center mb-4">
-										{[1, 2, 3, 4, 5].map(star => (
-											<span key={star} className="text-xl">
-												{star <= review.rating ? '⭐' : '☆'}
-											</span>
-										))}
-									</div>
-
-									{/* 독후감 미리보기 */}
-									<p className="text-sm text-gray-700 mb-4 line-clamp-3">{review.review}</p>
-
-									{/* 날짜 */}
-									<p className="text-xs text-gray-500 mb-4">
-										{new Date(review.createdAt).toLocaleDateString('ko-KR')}
-									</p>
-
-									{/* 버튼 */}
-									<div className="flex gap-2">
-										<button
-											onClick={() => setEditingReview(review)}
-											className="flex-1 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-										>
-											상세보기
-										</button>
-										<button
-											onClick={() => handleDelete(review.id)}
-											className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-										>
-											삭제
-										</button>
-									</div>
-								</div>
-							</div>
-						))}
+							)
+						})}
 					</div>
 				)}
 			</div>
@@ -200,10 +159,12 @@ export default function MyLibrary() {
 							{/* 책 정보 */}
 							<div className="flex gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
 								{editingReview.book.thumbnail ? (
-									<img
+									<Image
 										src={editingReview.book.thumbnail}
 										alt={editingReview.book.title}
-										className="w-24 h-32 object-cover rounded"
+										className="object-cover rounded"
+										width={96}
+										height={128}
 									/>
 								) : (
 									<div className="w-24 h-32 bg-gray-200 rounded flex items-center justify-center">
@@ -259,6 +220,6 @@ export default function MyLibrary() {
 					</div>
 				</div>
 			)}
-		</main>
+		</div>
 	)
 }

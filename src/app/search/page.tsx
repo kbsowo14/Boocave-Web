@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { ReviewModal } from '@/components/ReviewModal'
 import { BookCard } from '@/components/BookCard'
 import { MdDoNotDisturbAlt } from 'react-icons/md'
+import { LoadingIndicator } from '@/components/LoadingIndicator'
 
 type Book = {
 	googleId: string
@@ -51,7 +52,7 @@ export default function Search() {
 				{/* Loading Indicator */}
 				{loading && (
 					<div className="text-center py-20">
-						<div className="inline-block animate-spin rounded-full h-6 w-6 border-2 border-[#51CD42] border-t-transparent"></div>
+						<LoadingIndicator />
 					</div>
 				)}
 
