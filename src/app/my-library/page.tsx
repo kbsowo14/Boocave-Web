@@ -103,24 +103,30 @@ export default function MyLibrary() {
 					</div>
 				) : (
 					// 책이 있을 때
-					<div className="gap-6 w-full flex-wrap flex flex-row justify-between items-start">
+					<div className="gap-6 w-full flex-wrap flex flex-row justify-between items-end">
 						{reviews?.map((review, index) => {
 							const { thumbnail, title } = review?.book || {}
 							return (
 								<div
 									key={index}
-									className="w-24 h-40 flex justify-center items-center rounded-r-lg rounded-l-sm overflow-hidden relative"
+									className="flex rounded-r-lg rounded-l-sm overflow-hidden relative"
 								>
 									{/* 책 표지 */}
-									{thumbnail ? (
-										<Image src={thumbnail} alt={title || 'book'} width={96} height={160} />
-									) : (
-										<div className="bg-[#444444] w-full h-full flex justify-center items-center">
+									{!thumbnail ? (
+										<div className="bg-[#333333] w-24 h-36 flex justify-center items-center">
 											<MdOutlineImageNotSupported size={24} color="#fff" />
 										</div>
+									) : (
+										<Image
+											src={thumbnail}
+											alt={title || 'book'}
+											className="object-cover"
+											width={96}
+											height={144}
+										/>
 									)}
-									<div className="w-[2px] h-full bg-white/20 absolute left-[10px] top-0" />
-									<div className="w-[2px] h-full bg-black/20 absolute left-[8px] top-0" />
+									<div className="w-[2px] h-full bg-white/10 absolute left-[10px] top-0" />
+									<div className="w-[2px] h-full bg-black/10 absolute left-[8px] top-0" />
 								</div>
 							)
 						})}
