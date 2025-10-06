@@ -13,6 +13,14 @@ interface DeviceDimensionsMessage {
 	windowHeight: number
 }
 
+interface LogMessage {
+	type: 'LOG'
+	data: {
+		level: 'log' | 'warn' | 'error' | 'info'
+		message: string
+	}
+}
+
 export function useDeviceDimensions() {
 	const [dimensions, setDimensions] = useState<DeviceDimensions>({
 		windowWidth: 0,
@@ -38,34 +46,72 @@ export function useDeviceDimensions() {
 	}, [])
 
 	useEffect(() => {
-		// 웹뷰 환경 감지
-		const isInWebView =
-			window.navigator.userAgent.includes('wv') ||
-			window.navigator.userAgent.includes('WebView') ||
-			(window as { ReactNativeWebView?: unknown }).ReactNativeWebView
+		setIsWebView(true)
+		window.addEventListener('message', handleMessage)
 
-		if (isInWebView) {
-			setIsWebView(true)
-			window.addEventListener('message', handleMessage)
-		} else {
-			// 일반 브라우저에서는 window 크기 사용
-			const updateDimensions = () => {
-				setDimensions({
-					windowWidth: window.innerWidth,
-					windowHeight: window.innerHeight,
-				})
-			}
+		// 웹뷰에서 console.log를 React Native로 전달하도록 설정
+		const originalConsole = {
+			log: console.log,
+			warn: console.warn,
+			error: console.error,
+		}
 
-			updateDimensions()
-			window.addEventListener('resize', updateDimensions)
+		const sendLogToRN = (level: 'log' | 'warn' | 'error', ...args: unknown[]) => {
+			try {
+				const message = args
+					.map(arg => {
+						if (typeof arg === 'object') {
+							try {
+								return JSON.stringify(arg, null, 2)
+							} catch {
+								return String(arg)
+							}
+						}
+						return String(arg)
+					})
+					.join(' ')
 
-			return () => {
-				window.removeEventListener('resize', updateDimensions)
+				const logMessage: LogMessage = {
+					type: 'LOG',
+					data: {
+						level,
+						message,
+					},
+				}
+
+				// React Native로 메시지 전송 (안전 캐스팅 사용)
+				type WebViewBridge = { ReactNativeWebView?: { postMessage: (data: string) => void } }
+				const rnw = (window as unknown as WebViewBridge).ReactNativeWebView
+				rnw?.postMessage(JSON.stringify(logMessage))
+			} catch (error) {
+				originalConsole.error('Failed to send log to React Native:', error)
 			}
 		}
 
+		// console 메서드들 오버라이드
+		console.log = (...args: unknown[]) => {
+			originalConsole.log(...args)
+			sendLogToRN('log', ...args)
+		}
+
+		console.warn = (...args: unknown[]) => {
+			originalConsole.warn(...args)
+			sendLogToRN('warn', ...args)
+		}
+
+		console.error = (...args: unknown[]) => {
+			originalConsole.error(...args)
+			sendLogToRN('error', ...args)
+		}
+
 		return () => {
+			// 리스너 제거
 			window.removeEventListener('message', handleMessage)
+
+			// console 메서드 복원
+			console.log = originalConsole.log
+			console.warn = originalConsole.warn
+			console.error = originalConsole.error
 		}
 	}, [handleMessage])
 

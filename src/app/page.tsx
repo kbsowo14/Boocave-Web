@@ -5,23 +5,13 @@ import { Carousel } from 'react-responsive-carousel'
 import { useDevice, useIsMobile, useScreenSize } from '@/contexts/DeviceContext'
 
 export default function Home() {
-	const { isWebView, isReady } = useDevice()
+	const { isWebView } = useDevice()
 	const isMobile = useIsMobile()
 	const { windowWidth, windowHeight } = useScreenSize()
 
 	// 디바이스 크기에 따른 캐러셀 크기 계산
 	const carouselWidth = isMobile ? windowWidth : Math.min(windowWidth, 400)
 	const carouselHeight = isMobile ? Math.min(windowHeight * 0.3, 200) : 200
-
-	if (!isReady) {
-		return (
-			<div className="min-h-screen w-full flex justify-center items-center">
-				<div className="text-center">
-					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-				</div>
-			</div>
-		)
-	}
 
 	return (
 		<div className="min-h-screen w-full">
@@ -40,9 +30,6 @@ export default function Home() {
 					infiniteLoop={true}
 					autoPlay={true}
 					interval={3000}
-					onChange={() => {
-						console.log('onChange')
-					}}
 				>
 					<div>
 						<Image
