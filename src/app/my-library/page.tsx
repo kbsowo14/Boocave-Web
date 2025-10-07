@@ -7,25 +7,16 @@ import axios from 'axios'
 import Image from 'next/image'
 import { LoadingIndicator } from '@/components/LoadingIndicator'
 import { MdOutlineImageNotSupported } from 'react-icons/md'
-
-type BookReview = {
-	id: string
-	rating: number
-	review: string
-	createdAt: string
-	book: {
-		id: string
-		title: string
-		author: string
-		thumbnail: string
-		publisher: string
-		publishedDate: string
-	}
-}
+import { BookReview } from '@/types/book'
+import { MdDeleteOutline } from 'react-icons/md'
+import { FaRegEdit } from 'react-icons/fa'
+import { useScreenSize } from '@/contexts/DeviceContext'
 
 export default function MyLibrary() {
 	const { data: session, status } = useSession()
 	const router = useRouter()
+	const { windowWidth = 0 } = useScreenSize()
+
 	const [reviews, setReviews] = useState<BookReview[]>([])
 	const [loading, setLoading] = useState(true)
 	const [editingReview, setEditingReview] = useState<BookReview | null>(null)
@@ -110,6 +101,7 @@ export default function MyLibrary() {
 								<div
 									key={index}
 									className="flex rounded-r-lg rounded-l-sm overflow-hidden relative"
+									onClick={() => setEditingReview(review)}
 								>
 									{/* 책 표지 */}
 									{!thumbnail ? (
@@ -136,39 +128,46 @@ export default function MyLibrary() {
 
 			{/* 상세보기 모달 */}
 			{editingReview && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+				<div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
 					<div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
 						<div className="p-6">
 							{/* 헤더 */}
-							<div className="flex justify-between items-start mb-6">
-								<h2 className="text-2xl font-bold text-gray-900">독후감</h2>
-								<button
-									onClick={() => setEditingReview(null)}
-									className="text-gray-400 hover:text-gray-600"
+							<div className="flex flex-row justify-between items-center mb-6">
+								<div
+									className="flex flex-row justify-start items-center"
+									style={{ maxWidth: windowWidth - 102 - 16 }}
 								>
-									<svg
-										className="w-6 h-6"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
+									<p className="text-xl font-bold text-gray-900 truncate">
+										{editingReview?.book?.title || ''}
+									</p>
+									<button
+										onClick={() => {
+											console.log('수정하기')
+										}}
+										className="ml-3"
 									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M6 18L18 6M6 6l12 12"
-										/>
-									</svg>
+										<FaRegEdit size={18} color="#333333" className="-translate-y-[1px]" />
+									</button>
+								</div>
+								<button
+									className="flex"
+									onClick={() => {
+										if (!!editingReview?.id) {
+											handleDelete(editingReview?.id)
+										}
+									}}
+								>
+									<MdDeleteOutline size={22} color="#C3C3C3" />
 								</button>
 							</div>
 
 							{/* 책 정보 */}
 							<div className="flex gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
-								{editingReview.book.thumbnail ? (
+								{editingReview?.book?.thumbnail ? (
 									<Image
 										src={editingReview.book.thumbnail}
-										alt={editingReview.book.title}
-										className="object-cover rounded"
+										alt={editingReview.book.title || ''}
+										className="object-contain rounded"
 										width={96}
 										height={128}
 									/>
@@ -179,29 +178,29 @@ export default function MyLibrary() {
 								)}
 								<div className="flex-1">
 									<h3 className="text-lg font-semibold text-gray-900 mb-1">
-										{editingReview.book.title}
+										{editingReview?.book?.title || ''}
 									</h3>
-									<p className="text-sm text-gray-600">{editingReview.book.author}</p>
+									<p className="text-sm text-gray-600">{editingReview?.book?.author || ''}</p>
 									<p className="text-xs text-gray-500 mt-1">
-										{editingReview.book.publisher} ·{' '}
-										{editingReview.book.publishedDate?.substring(0, 4)}
+										{editingReview?.book?.publisher || ''} ·{' '}
+										{editingReview?.book?.publishedDate?.substring(0, 4)}
 									</p>
 									<div className="flex items-center mt-3">
 										{[1, 2, 3, 4, 5].map(star => (
 											<span key={star} className="text-2xl">
-												{star <= editingReview.rating ? '⭐' : '☆'}
+												{star <= (editingReview?.rating || 0) ? '★' : '☆'}
 											</span>
 										))}
 									</div>
 								</div>
 							</div>
 
-							{/* 독후감 */}
+							{/* 리뷰 */}
 							<div className="mb-6">
-								<h4 className="text-sm font-medium text-gray-700 mb-2">독후감</h4>
+								<h4 className="text-sm font-medium text-gray-700 mb-2">내가 작성한 리뷰</h4>
 								<div className="p-4 bg-gray-50 rounded-lg">
 									<p className="text-gray-800 whitespace-pre-wrap leading-relaxed">
-										{editingReview.review}
+										{editingReview?.review || ''}
 									</p>
 								</div>
 							</div>
@@ -209,7 +208,7 @@ export default function MyLibrary() {
 							{/* 날짜 */}
 							<p className="text-sm text-gray-500 mb-6">
 								작성일:{' '}
-								{new Date(editingReview.createdAt).toLocaleDateString('ko-KR', {
+								{new Date(editingReview?.createdAt || '').toLocaleDateString('ko-KR', {
 									year: 'numeric',
 									month: 'long',
 									day: 'numeric',
@@ -218,9 +217,9 @@ export default function MyLibrary() {
 
 							<button
 								onClick={() => setEditingReview(null)}
-								className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+								className="w-full px-4 py-3 bg-[#51CD42] text-white rounded-lg hover:bg-blue-700 transition-colors"
 							>
-								닫기
+								확인
 							</button>
 						</div>
 					</div>
