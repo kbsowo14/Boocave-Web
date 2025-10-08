@@ -16,6 +16,11 @@ export default function Home() {
 			rating: 5,
 			review: 'review1',
 			createdAt: '2021-01-01',
+			user_name: 'user1',
+			is_liked: true,
+			like_count: 3020,
+			comment_count: 23,
+			is_pinned: true,
 			book: {
 				id: '1',
 				title: 'book1',
@@ -24,12 +29,18 @@ export default function Home() {
 				publisher: 'publisher1',
 				publishedDate: 'publishedDate1',
 			},
+			review_images: ['/review_img_01.png'],
 		},
 		{
 			id: '2',
 			rating: 4,
 			review: 'review2',
 			createdAt: '2021-01-02',
+			user_name: 'user2',
+			is_liked: false,
+			like_count: 245,
+			comment_count: 12,
+			is_pinned: false,
 			book: {
 				id: '2',
 				title: 'book2',
@@ -38,12 +49,18 @@ export default function Home() {
 				publisher: 'publisher2',
 				publishedDate: 'publishedDate2',
 			},
+			review_images: ['/review_img_02.jpg'],
 		},
 		{
 			id: '3',
 			rating: 3,
 			review: 'review3',
 			createdAt: '2021-01-03',
+			user_name: 'user3',
+			is_liked: false,
+			like_count: 8,
+			comment_count: 1,
+			is_pinned: false,
 			book: {
 				id: '3',
 				title: 'book3',
@@ -52,20 +69,14 @@ export default function Home() {
 				publisher: 'publisher3',
 				publishedDate: 'publishedDate3',
 			},
+			review_images: ['/review_img_03.jpeg'],
 		},
 	]
 
 	if (!windowWidth) return
 	return (
 		<div className="min-h-screen" style={{ width: windowWidth }}>
-			{/* 디바이스 정보 표시 (개발용) */}
-			{isWebView && (
-				<div className="mb-4 p-2 bg-gray-800 rounded text-xs text-gray-400">
-					웹뷰 환경 | 크기: {windowWidth}x{windowHeight}
-				</div>
-			)}
-
-			<Carousel
+			{/* <Carousel
 				showArrows={false}
 				showThumbs={false}
 				showStatus={false}
@@ -80,9 +91,9 @@ export default function Home() {
 				<div className="relative w-full h-[320px]">
 					<Image src="/land-02.png" alt="land-02" fill className="object-contain" />
 				</div>
-			</Carousel>
+			</Carousel> */}
 
-			<div className="grid grid-cols-1 gap-4 px-4">
+			<div className="grid grid-cols-1 gap-4 mt-4">
 				{feedDataList?.length > 0 &&
 					feedDataList?.map(item => <FeedCard key={item.id} data={item} />)}
 			</div>
