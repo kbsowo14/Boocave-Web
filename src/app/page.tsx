@@ -14,7 +14,7 @@ export default function Home() {
 		{
 			id: '1',
 			rating: 5,
-			review: 'review1',
+			review: `스님의 느긋함을 배울 필요가 있다...\n낙원은 '락'이다!\n\n#자기탐구 이또한 지나가리라... #마음공부`,
 			createdAt: '2021-01-01',
 			user_name: 'user1',
 			is_liked: true,
@@ -34,7 +34,7 @@ export default function Home() {
 		{
 			id: '2',
 			rating: 4,
-			review: 'review2',
+			review: '간단한 리뷰 테스트 입니다!\n\n#테스트 #테스트2',
 			createdAt: '2021-01-02',
 			user_name: 'user2',
 			is_liked: false,
@@ -54,7 +54,7 @@ export default function Home() {
 		{
 			id: '3',
 			rating: 3,
-			review: 'review3',
+			review: '간단한 리뷰 테스트 입니다!\n\n#테스트 #테스트2',
 			createdAt: '2021-01-03',
 			user_name: 'user3',
 			is_liked: false,

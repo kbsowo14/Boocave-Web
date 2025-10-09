@@ -7,6 +7,8 @@ import { BiLike, BiSolidLike } from 'react-icons/bi'
 import { FaRegComment } from 'react-icons/fa'
 import { MdOutlineShare } from 'react-icons/md'
 import { AiOutlinePushpin, AiFillPushpin } from 'react-icons/ai'
+import FeedCardText from '@/components/FeedCardText'
+import dayjs from 'dayjs'
 
 /**
  * @description
@@ -88,6 +90,20 @@ export default function FeedCard({ data = {} }: { data: BookReview }) {
 						<AiOutlinePushpin size={22} color="#fff" />
 					)}
 				</button>
+			</div>
+
+			{/* Contents Area */}
+			<div className="w-full px-4 pb-2">
+				<FeedCardText
+					text={review || ''}
+					hashtagColor="#51CD42"
+					className="text-white text-sm whitespace-pre-wrap"
+				/>
+			</div>
+
+			{/* Date Area */}
+			<div className="w-full px-4 pb-2">
+				<p className="text-white/50 text-xs">{dayjs(createdAt).format('M월 D일')}</p>
 			</div>
 		</div>
 	)
