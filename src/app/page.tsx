@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { Carousel } from 'react-responsive-carousel'
 import { useDevice, useScreenSize } from '@/contexts/DeviceContext'
 import FeedCard from '@/components/FeedCard'
+import MyFollowList from '@/components/MyFollowList'
 
 export default function Home() {
 	const { isWebView } = useDevice()
@@ -76,6 +77,8 @@ export default function Home() {
 	if (!windowWidth) return
 	return (
 		<div className="min-h-screen" style={{ width: windowWidth }}>
+			{/* 팔로잉 리스트 */}
+			<MyFollowList />
 			{/* <Carousel
 				showArrows={false}
 				showThumbs={false}
@@ -93,7 +96,7 @@ export default function Home() {
 				</div>
 			</Carousel> */}
 
-			<div className="grid grid-cols-1 gap-4 mt-4">
+			<div className="grid grid-cols-1 gap-4">
 				{feedDataList?.length > 0 &&
 					feedDataList?.map(item => <FeedCard key={item.id} data={item} />)}
 			</div>
