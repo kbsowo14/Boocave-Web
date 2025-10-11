@@ -9,6 +9,8 @@ import { MdOutlineShare } from 'react-icons/md'
 import { AiOutlinePushpin, AiFillPushpin } from 'react-icons/ai'
 import FeedCardText from '@/components/FeedCardText'
 import dayjs from 'dayjs'
+import { useBottomSheetStore } from '@/stores/useBottomSheetStore'
+import { PiSiren } from 'react-icons/pi'
 
 /**
  * @description
@@ -16,6 +18,7 @@ import dayjs from 'dayjs'
  */
 export default function FeedCard({ data = {} }: { data: BookReview }) {
 	const { windowWidth = 0 } = useScreenSize()
+	const openBottomSheet = useBottomSheetStore(state => state?.open)
 
 	const {
 		id,
@@ -55,7 +58,19 @@ export default function FeedCard({ data = {} }: { data: BookReview }) {
 				<button
 					className="flex items-center justify-center"
 					onClick={() => {
-						console.log('more')
+						openBottomSheet(
+							<div className="p-4">
+								<button
+									onClick={() => {
+										console.log('신고하기')
+									}}
+									className="w-full py-4 text-left rounded-lg px-4 flex flex-row justify-start items-center"
+								>
+									<PiSiren size={16} color="#fff" />
+									<span className="text-white text-sm ml-2">신고하기</span>
+								</button>
+							</div>
+						)
 					}}
 				>
 					<IoMdMore size={24} color="#fff" />
