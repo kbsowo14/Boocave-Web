@@ -29,6 +29,7 @@ export default function FeedCard({ data = {} }: { data: BookReview }) {
 		like_count = 0,
 		comment_count = 0,
 		is_pinned = false,
+		is_following = false,
 	} = data || {}
 	const { title, author, thumbnail, publisher, publishedDate } = book || {}
 
@@ -40,6 +41,16 @@ export default function FeedCard({ data = {} }: { data: BookReview }) {
 				<div className="flex flex-row justify-start items-center">
 					<div className="w-10 h-10 bg-[#333333] rounded-full overflow-hidden flex justify-center items-center"></div>
 					<span className="text-white text-sm ml-2">{user_name}</span>
+					{!is_following && (
+						<button
+							onClick={() => {
+								console.log('팔로우')
+							}}
+							className="ml-2 flex items-center justify-center border-[1px] border-[#ffffff] text-white text-xs px-2 py-1 rounded-md"
+						>
+							팔로우
+						</button>
+					)}
 				</div>
 				<button
 					className="flex items-center justify-center"

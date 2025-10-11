@@ -22,6 +22,7 @@ export default function Home() {
 			like_count: 3020,
 			comment_count: 23,
 			is_pinned: true,
+			is_following: false,
 			book: {
 				id: '1',
 				title: 'book1',
@@ -42,6 +43,7 @@ export default function Home() {
 			like_count: 245,
 			comment_count: 12,
 			is_pinned: false,
+			is_following: true,
 			book: {
 				id: '2',
 				title: 'book2',
@@ -62,6 +64,7 @@ export default function Home() {
 			like_count: 8,
 			comment_count: 1,
 			is_pinned: false,
+			is_following: false,
 			book: {
 				id: '3',
 				title: 'book3',

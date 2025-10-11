@@ -9,6 +9,7 @@ export type BookReview = {
 	like_count?: number
 	comment_count?: number
 	is_pinned?: boolean
+	is_following?: boolean
 	book?: {
 		id?: string
 		title?: string
