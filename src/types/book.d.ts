@@ -1,5 +1,6 @@
 export type BookReview = {
 	id?: string
+	userId?: string
 	rating?: number
 	review?: string
 	createdAt?: string

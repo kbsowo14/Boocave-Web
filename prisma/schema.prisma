@@ -48,8 +48,23 @@ model User {
   accounts      Account[]
   sessions      Session[]
   bookReviews   BookReview[]
+  following     Follow[]  @relation("UserFollowing")
+  followers     Follow[]  @relation("UserFollowers")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String   // 팔로우를 하는 사용자
+  followingId String   // 팔로우를 받는 사용자
+  follower    User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId]) // 중복 팔로우 방지
+  @@index([followerId])
+  @@index([followingId])
 }
 
 model VerificationToken {

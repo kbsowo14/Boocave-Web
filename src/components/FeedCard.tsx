@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import React from 'react'
+import React, { useState } from 'react'
 import { BookReview } from '@/types/book'
 import { useScreenSize } from '@/contexts/DeviceContext'
 import { IoMdMore } from 'react-icons/io'
@@ -22,6 +22,7 @@ export default function FeedCard({ data = {} }: { data: BookReview }) {
 
 	const {
 		id,
+		userId,
 		rating,
 		review,
 		createdAt,
@@ -36,6 +37,53 @@ export default function FeedCard({ data = {} }: { data: BookReview }) {
 	} = data || {}
 	const { title, author, thumbnail, publisher, publishedDate } = book || {}
 
+	// 팔로우 상태 관리
+	const [isFollowing, setIsFollowing] = useState(is_following)
+	const [isFollowLoading, setIsFollowLoading] = useState(false)
+
+	// 팔로우/언팔로우 처리
+	const handleFollowToggle = async () => {
+		if (!userId || isFollowLoading) return
+
+		setIsFollowLoading(true)
+		try {
+			if (isFollowing) {
+				// 언팔로우
+				const response = await fetch(`/api/follow?followingId=${userId}`, {
+					method: 'DELETE',
+				})
+
+				if (!response.ok) {
+					const error = await response.json()
+					throw new Error(error.error || '언팔로우에 실패했습니다.')
+				}
+
+				setIsFollowing(false)
+			} else {
+				// 팔로우
+				const response = await fetch('/api/follow', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ followingId: userId }),
+				})
+
+				if (!response.ok) {
+					const error = await response.json()
+					throw new Error(error.error || '팔로우에 실패했습니다.')
+				}
+
+				setIsFollowing(true)
+			}
+		} catch (error) {
+			console.error('팔로우 처리 중 오류:', error)
+			alert(error instanceof Error ? error.message : '오류가 발생했습니다.')
+		} finally {
+			setIsFollowLoading(false)
+		}
+	}
+
 	if (!windowWidth) return null
 	return (
 		<div className="flex flex-col justify-center items-center border-t-[1px] border-[#444444]">
@@ -44,11 +92,10 @@ export default function FeedCard({ data = {} }: { data: BookReview }) {
 				<div className="flex flex-row justify-start items-center">
 					<div className="w-10 h-10 bg-[#333333] rounded-full overflow-hidden flex justify-center items-center"></div>
 					<span className="text-white text-sm ml-2">{user_name}</span>
-					{!is_following && (
+					{!isFollowing && (
 						<button
-							onClick={() => {
-								console.log('팔로우')
-							}}
+							onClick={handleFollowToggle}
+							disabled={isFollowLoading}
 							className="ml-2 flex items-center justify-center border-[1px] border-[#ffffff] text-white text-xs px-2 py-1 rounded-md"
 						>
 							팔로우
