@@ -12,8 +12,8 @@ import {
 import { AiOutlineMessage } from 'react-icons/ai'
 
 export function NavBar() {
-	const { data: session, status } = useSession()
-	const { image: userImage = '', name: userName = '' } = session?.user || {}
+	const { data: session } = useSession()
+	const { image: userImage = '' } = session?.user || {}
 
 	const navItems = useMemo(
 		() => [

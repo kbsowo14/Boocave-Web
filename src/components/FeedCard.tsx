@@ -21,9 +21,7 @@ export default function FeedCard({ data = {} }: { data: BookReview }) {
 	const openBottomSheet = useBottomSheetStore(state => state?.open)
 
 	const {
-		id,
 		userId,
-		rating,
 		review,
 		createdAt,
 		book = {},
@@ -35,7 +33,7 @@ export default function FeedCard({ data = {} }: { data: BookReview }) {
 		is_pinned = false,
 		is_following = false,
 	} = data || {}
-	const { title, author, thumbnail, publisher, publishedDate } = book || {}
+	const { title } = book || {}
 
 	// 팔로우 상태 관리
 	const [isFollowing, setIsFollowing] = useState(is_following)

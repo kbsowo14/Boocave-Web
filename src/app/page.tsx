@@ -1,14 +1,11 @@
 'use client'
 
-import Image from 'next/image'
-import { Carousel } from 'react-responsive-carousel'
-import { useDevice, useScreenSize } from '@/contexts/DeviceContext'
+import { useScreenSize } from '@/contexts/DeviceContext'
 import FeedCard from '@/components/FeedCard'
 import MyFollowList from '@/components/MyFollowList'
 
 export default function Home() {
-	const { isWebView } = useDevice()
-	const { windowWidth = 0, windowHeight = 0 } = useScreenSize()
+	const { windowWidth = 0 } = useScreenSize()
 
 	// for testing data list
 	const feedDataList = [

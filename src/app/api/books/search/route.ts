@@ -21,16 +21,29 @@ export async function GET(request: NextRequest) {
 
 		// Google Books API 응답을 우리 형식에 맞게 변환
 		const books =
-			data.items?.map((item: any) => ({
-				googleId: item.id,
-				title: item.volumeInfo.title,
-				author: item.volumeInfo.authors?.join(', ') || '작자 미상',
-				publisher: item.volumeInfo.publisher || '',
-				publishedDate: item.volumeInfo.publishedDate || '',
-				description: item.volumeInfo.description || '',
-				thumbnail: item.volumeInfo.imageLinks?.thumbnail || '',
-				isbn: item.volumeInfo.industryIdentifiers?.[0]?.identifier || '',
-			})) || []
+			data.items?.map(
+				(item: {
+					id: string
+					volumeInfo: {
+						title: string
+						authors?: string[]
+						publisher?: string
+						publishedDate?: string
+						description?: string
+						imageLinks?: { thumbnail?: string }
+						industryIdentifiers?: { identifier?: string }[]
+					}
+				}) => ({
+					googleId: item.id,
+					title: item.volumeInfo.title,
+					author: item.volumeInfo.authors?.join(', ') || '작자 미상',
+					publisher: item.volumeInfo.publisher || '',
+					publishedDate: item.volumeInfo.publishedDate || '',
+					description: item.volumeInfo.description || '',
+					thumbnail: item.volumeInfo.imageLinks?.thumbnail || '',
+					isbn: item.volumeInfo.industryIdentifiers?.[0]?.identifier || '',
+				})
+			) || []
 
 		return NextResponse.json({ books })
 	} catch (error) {
