@@ -55,7 +55,7 @@ export default function ChatMessages({ messages, loading = false }: ChatMessages
 						<div
 							className={`max-w-[80%] rounded-2xl px-4 py-3 ${
 								message.role === 'user'
-									? 'bg-[#51CD42] text-white'
+									? 'bg-[#35a828] text-white'
 									: 'bg-gray-700 text-white border border-gray-600'
 							}`}
 						>

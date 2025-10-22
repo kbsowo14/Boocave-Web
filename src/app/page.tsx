@@ -37,7 +37,7 @@ export default function Home() {
 					{/* 왼쪽 말풍선 (초록색) */}
 					<div className="absolute left-1/2 ml-8 mb-4 animate-bubble-left">
 						<div className="bg-[#51CD42] text-white text-xs px-3 py-2 rounded-2xl rounded-bl-none relative">
-							안녕?
+							감동적이야!
 						</div>
 					</div>
 
@@ -49,7 +49,7 @@ export default function Home() {
 					{/* 오른쪽 말풍선 (하얀색) */}
 					<div className="absolute right-1/2 mr-8 mb-8 animate-bubble-right">
 						<div className="bg-white text-gray-800 text-xs px-3 py-2 rounded-2xl rounded-br-none relative">
-							반가워!
+							정말 잘 읽었어!
 						</div>
 					</div>
 				</div>

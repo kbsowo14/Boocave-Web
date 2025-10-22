@@ -9,7 +9,6 @@ import { LoadingIndicator } from '@/components/LoadingIndicator'
 import { MdOutlineImageNotSupported } from 'react-icons/md'
 import { BookReview } from '@/types/book'
 import { MdDeleteOutline } from 'react-icons/md'
-import { FaRegEdit } from 'react-icons/fa'
 import { useScreenSize } from '@/contexts/DeviceContext'
 
 export default function MyLibrary() {
@@ -51,6 +50,8 @@ export default function MyLibrary() {
 			await axios.delete(`/api/reviews/${reviewId}`)
 			setReviews(reviews.filter(r => r.id !== reviewId))
 			alert('삭제되었습니다')
+			setEditingReview(null)
+			router.refresh()
 		} catch (error) {
 			console.error('삭제 오류:', error)
 			alert('삭제에 실패했습니다')
@@ -71,7 +72,7 @@ export default function MyLibrary() {
 
 	return (
 		<div className="w-full min-h-screen flex flex-col justify-start items-center">
-			<div className="px-4">
+			<div className="px-4 w-full">
 				<div className="py-8">
 					<p className="text-white">
 						총 <span className="font-semibold text-[#51CD42]">{reviews.length}권</span>의 책을
@@ -86,7 +87,7 @@ export default function MyLibrary() {
 						<p className="text-lg font-semibold text-white mb-1">아직 등록된 책이 없습니다</p>
 						<p className="text-white text-sm">첫 번째 책을 검색하고 리뷰를 작성해보세요!</p>
 						<button
-							onClick={() => router.push('/search')}
+							onClick={() => router.push('/')}
 							className="text-sm font-bold text-[#51CD42] rounded-lg transition-colors mt-6"
 						>
 							추가하기 +
@@ -94,7 +95,7 @@ export default function MyLibrary() {
 					</div>
 				) : (
 					// 책이 있을 때
-					<div className="gap-6 w-full flex-wrap flex flex-row justify-between items-end">
+					<div className="gap-6 w-full flex-wrap flex flex-row justify-start items-end">
 						{reviews?.map((review, index) => {
 							const { thumbnail, title } = review?.book || {}
 							return (
@@ -140,14 +141,6 @@ export default function MyLibrary() {
 									<p className="text-xl font-bold text-gray-900 truncate">
 										{editingReview?.book?.title || ''}
 									</p>
-									<button
-										onClick={() => {
-											console.log('수정하기')
-										}}
-										className="ml-3"
-									>
-										<FaRegEdit size={18} color="#333333" className="-translate-y-[1px]" />
-									</button>
 								</div>
 								<button
 									className="flex"
