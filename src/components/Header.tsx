@@ -1,5 +1,7 @@
 'use client'
 
+import { useSession } from 'next-auth/react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { FaRegBell } from 'react-icons/fa'
 import { RxPencil1 } from 'react-icons/rx'
@@ -9,10 +11,13 @@ import { RxPencil1 } from 'react-icons/rx'
  * 헤더 컴포넌트
  */
 export function Header() {
+	const { data: session } = useSession()
+	const { image: userImage = '' } = session?.user || {}
+
 	return (
-		<header className="sticky top-0 z-10 border-b-[1px] border-[#222222] bg-[#171717]">
-			<div className="px-4">
-				<div className="pt-2 pb-4 flex flex-row justify-between items-center">
+		<>
+			<header className="fixed top-0 z-10 border-b-[1px] border-[#222222] bg-[#171717] h-16 w-full flex justify-center items-center px-4">
+				<div className="flex flex-row justify-between items-center w-full">
 					<Link
 						href="/"
 						className="text-lg font-bold flex flex-row justify-start items-center relative"
@@ -22,11 +27,16 @@ export function Header() {
 						<div className="w-[102px] h-[1px] bg-white absolute bottom-[7px] left-[1px]" />
 						<RxPencil1 size={18} color="#fff" className="absolute bottom-[5px] left-[100px]" />
 					</Link>
-					<Link href="/notice" className="text-white">
-						<FaRegBell size={18} color="#fff" />
-					</Link>
+					<div className="flex flex-row justify-end items-center">
+						<div className="flex justify-center items-center h-6 w-6 border-[1px] border-white rounded-full mr-3 overflow-hidden">
+							{!!userImage && <Image src={userImage} alt="user-image" width={24} height={24} />}
+						</div>
+						<Link href="/notice" className="text-white">
+							<FaRegBell size={20} color="#fff" />
+						</Link>
+					</div>
 				</div>
-			</div>
-		</header>
+			</header>
+		</>
 	)
 }

@@ -19,7 +19,7 @@ type BookCardProps = {
 export function BookCard({ book, onSelect }: BookCardProps) {
 	return (
 		<div
-			onClick={() => onSelect(book)}
+			onClick={onSelect}
 			className="flex gap-4 p-4 border border-[#444444] rounded-lg hover:shadow-lg transition-shadow cursor-pointer bg-[#333333]"
 		>
 			<div className="flex-shrink-0">

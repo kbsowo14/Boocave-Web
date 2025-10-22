@@ -9,6 +9,12 @@ export default function MyMenu() {
 	const { data: session, status } = useSession()
 	const { image: userImage = '', name: userName = '' } = session?.user || {}
 
+	// 디버깅: 세션 정보 확인
+	console.log('세션 상태:', status)
+	console.log('세션 데이터:', session)
+	console.log('사용자 이미지:', userImage)
+	console.log('사용자 이름:', userName)
+
 	const menuList = useMemo(
 		() => [
 			{
@@ -24,6 +30,15 @@ export default function MyMenu() {
 		],
 		[userName]
 	)
+
+	// 로딩 중일 때
+	if (status === 'loading') {
+		return (
+			<div className="flex justify-center items-center min-h-screen">
+				<p className="text-white">로딩 중...</p>
+			</div>
+		)
+	}
 
 	return (
 		<div>
