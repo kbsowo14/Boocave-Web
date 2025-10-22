@@ -2,7 +2,7 @@
 
 import { BookSearchForm } from '@/components/BookSearchForm'
 import axios from 'axios'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, Suspense } from 'react'
 import { ReviewModal } from '@/components/ReviewModal'
 import { BookCard } from '@/components/BookCard'
 import { MdDoNotDisturbAlt } from 'react-icons/md'
@@ -21,7 +21,7 @@ type Book = {
 	isbn: string
 }
 
-export default function Search() {
+function SearchContent() {
 	const searchParams = useSearchParams()
 	const queryParam = searchParams?.get('query') || ''
 	const router = useRouter()
@@ -112,5 +112,19 @@ export default function Search() {
 				/>
 			)} */}
 		</div>
+	)
+}
+
+export default function Search() {
+	return (
+		<Suspense
+			fallback={
+				<div className="w-full flex justify-center items-center min-h-screen">
+					<LoadingIndicator />
+				</div>
+			}
+		>
+			<SearchContent />
+		</Suspense>
 	)
 }

@@ -5,7 +5,7 @@ import ChatInput from '@/components/ChatInput'
 import ChatMessages from '@/components/ChatMessages'
 import axios from 'axios'
 import { useSearchParams } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 
 type Book = {
 	googleId: string
@@ -23,7 +23,7 @@ type Message = {
 	content: string
 }
 
-export default function Chat() {
+function ChatContent() {
 	const searchParams = useSearchParams()
 	const bookGoogleId = searchParams?.get('bookGoogleId') || ''
 
@@ -123,5 +123,19 @@ export default function Chat() {
 				<ChatInput onSend={sendMessage} disabled={loading} />
 			</div>
 		</div>
+	)
+}
+
+export default function Chat() {
+	return (
+		<Suspense
+			fallback={
+				<div className="w-full flex justify-center items-center min-h-screen">
+					<p className="text-white">로딩 중...</p>
+				</div>
+			}
+		>
+			<ChatContent />
+		</Suspense>
 	)
 }
