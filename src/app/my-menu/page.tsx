@@ -2,33 +2,30 @@
 
 import { useSession, signIn, signOut } from 'next-auth/react'
 import Image from 'next/image'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { FaAngleRight } from 'react-icons/fa'
 
 export default function MyMenu() {
 	const { data: session, status } = useSession()
 	const { image: userImage = '', name: userName = '' } = session?.user || {}
-
-	// 디버깅: 세션 정보 확인
-	console.log('세션 상태:', status)
-	console.log('세션 데이터:', session)
-	console.log('사용자 이미지:', userImage)
-	console.log('사용자 이름:', userName)
+	const [isLoggingOut, setIsLoggingOut] = useState(false)
 
 	const menuList = useMemo(
 		() => [
 			{
-				label: !!userName ? '로그아웃' : '로그인',
-				onPress: () => {
-					if (!!userName) {
-						signOut()
-					} else {
-						signIn('google')
+				label: '로그아웃',
+				onPress: async () => {
+					try {
+						setIsLoggingOut(true)
+						await signOut({ callbackUrl: '/login' })
+					} catch (error) {
+						console.error('로그아웃 오류:', error)
+						setIsLoggingOut(false)
 					}
 				},
 			},
 		],
-		[userName]
+		[]
 	)
 
 	// 로딩 중일 때
@@ -41,12 +38,19 @@ export default function MyMenu() {
 	}
 
 	return (
-		<div>
+		<div className="w-full min-h-screen relative">
+			{/* 로그아웃 중 전체 화면 로딩 */}
+			{isLoggingOut && (
+				<div className="fixed inset-0 bg-black/70 flex flex-col justify-center items-center z-50">
+					<div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+				</div>
+			)}
+
 			{/* Profile */}
 			{!userName ? (
 				<button
 					className="px-4 py-6 flex flex-row justify-start items-center"
-					onClick={() => signIn('google')}
+					onClick={() => signIn('google', { callbackUrl: '/' })}
 				>
 					<div className="w-16 h-16 bg-[#333333] rounded-full overflow-hidden flex justify-center items-center"></div>
 					<p className="ml-4 text-white text-base font-bold">로그인을 해주세요.</p>
@@ -94,8 +98,9 @@ export default function MyMenu() {
 					return (
 						<button
 							key={index}
-							className="w-full flex flex-row justify-between items-center px-6 py-4 border-b-[1px] border-white/20"
+							className="w-full flex flex-row justify-between items-center px-6 py-4 border-b-[1px] border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
 							onClick={onPress}
+							disabled={isLoggingOut}
 						>
 							<p className="text-white text-sm">{label}</p>
 							<FaAngleRight size={16} color="#fff" />

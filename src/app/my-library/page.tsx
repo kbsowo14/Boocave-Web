@@ -70,12 +70,12 @@ export default function MyLibrary() {
 	}
 
 	return (
-		<div className="">
+		<div className="w-full min-h-screen flex flex-col justify-start items-center">
 			<div className="px-4">
 				<div className="py-8">
 					<p className="text-white">
 						총 <span className="font-semibold text-[#51CD42]">{reviews.length}권</span>의 책을
-						기록했어요.
+						읽었습니다!
 					</p>
 				</div>
 

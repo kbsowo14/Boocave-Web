@@ -49,18 +49,57 @@ export default function Chat() {
 		setLoading(true)
 
 		try {
-			const response = await axios.post('/api/chat', {
-				messages: [...messages, userMessage],
-				bookInfo: currentBookInfo,
+			// 스트리밍 응답을 위한 fetch 사용
+			const response = await fetch('/api/chat', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					messages: [...messages, userMessage],
+					bookInfo: currentBookInfo,
+				}),
 			})
 
-			// AI 응답 추가
-			const aiMessage: Message = response.data.message
-			setMessages(prev => [...prev, aiMessage])
+			if (!response.ok) {
+				throw new Error('AI 응답 생성에 실패했습니다')
+			}
+
+			const reader = response.body?.getReader()
+			const decoder = new TextDecoder()
+
+			if (!reader) {
+				throw new Error('스트리밍 응답을 받을 수 없습니다')
+			}
+
+			// AI 메시지 초기화 (빈 메시지로 시작)
+			const aiMessageIndex = messages.length + 1
+			setMessages(prev => [...prev, { role: 'assistant', content: '' }])
+			setLoading(false)
+
+			let accumulatedContent = ''
+
+			// 스트리밍 데이터 읽기
+			while (true) {
+				const { done, value } = await reader.read()
+				if (done) break
+
+				const chunk = decoder.decode(value)
+				accumulatedContent += chunk
+
+				// 메시지 업데이트 (타이핑 효과)
+				setMessages(prev => {
+					const newMessages = [...prev]
+					newMessages[aiMessageIndex] = {
+						role: 'assistant',
+						content: accumulatedContent,
+					}
+					return newMessages
+				})
+			}
 		} catch (error) {
 			console.error('메시지 전송 오류:', error)
 			alert('메시지 전송에 실패했습니다')
-		} finally {
 			setLoading(false)
 		}
 	}
@@ -80,7 +119,7 @@ export default function Chat() {
 			<ChatMessages messages={messages} loading={loading} />
 
 			{/* Input Area */}
-			<div className="w-full fixed bottom-0 flex justify-center items-center p-4">
+			<div className="w-full fixed bottom-0 flex justify-center items-center p-4 bg-[#171717]">
 				<ChatInput onSend={sendMessage} disabled={loading} />
 			</div>
 		</div>

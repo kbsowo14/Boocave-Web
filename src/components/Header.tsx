@@ -28,12 +28,15 @@ export function Header() {
 						<RxPencil1 size={18} color="#fff" className="absolute bottom-[5px] left-[100px]" />
 					</Link>
 					<div className="flex flex-row justify-end items-center">
-						<div className="flex justify-center items-center h-6 w-6 border-[1px] border-white rounded-full mr-3 overflow-hidden">
+						<Link
+							href="/my-menu"
+							className="flex justify-center items-center h-6 w-6 border-[1px] border-white rounded-full mr-3 overflow-hidden"
+						>
 							{!!userImage && <Image src={userImage} alt="user-image" width={24} height={24} />}
-						</div>
-						<Link href="/notice" className="text-white">
-							<FaRegBell size={20} color="#fff" />
 						</Link>
+						<div className="text-white" onClick={() => alert('준비중 입니다...')}>
+							<FaRegBell size={20} color="#fff" />
+						</div>
 					</div>
 				</div>
 			</header>
