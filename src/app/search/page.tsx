@@ -2,8 +2,7 @@
 
 import { BookSearchForm } from '@/components/BookSearchForm'
 import axios from 'axios'
-import { useEffect, useRef, useState, Suspense } from 'react'
-import { ReviewModal } from '@/components/ReviewModal'
+import { useEffect, useRef, useState, Suspense, useCallback } from 'react'
 import { BookCard } from '@/components/BookCard'
 import { MdDoNotDisturbAlt } from 'react-icons/md'
 import { LoadingIndicator } from '@/components/LoadingIndicator'
@@ -31,36 +30,47 @@ function SearchContent() {
 
 	const isPending = useRef(false)
 
-	const handleSearch = async (query: string) => {
-		if (isPending.current) return
-		isPending.current = true
+	const handleSearch = useCallback(
+		async (query: string) => {
+			if (isPending.current) return
+			isPending.current = true
 
-		setLoading(true)
+			setLoading(true)
 
-		try {
-			const response = await axios.get(`/api/books/search?q=${encodeURIComponent(query)}`)
-			setBooks(response.data.books)
-		} catch (error: any) {
-			console.error('검색 오류:', error)
+			try {
+				const response = await axios.get(`/api/books/search?q=${encodeURIComponent(query)}`)
+				setBooks(response.data.books)
+			} catch (error: unknown) {
+				console.error('검색 오류:', error)
 
-			// API 제한 에러 (429) 또는 기타 에러 시 자동으로 채팅으로 이동
-			if (error.response?.status === 429 || error.response?.status >= 500) {
-				alert('도서 검색 서비스가 일시적으로 제한되었습니다.\nAI와 직접 토론을 시작합니다!')
-				router.push(`/chat?query=${encodeURIComponent(query)}`)
-			} else {
-				alert('도서 검색에 실패했습니다')
+				// API 제한 에러 (429) 또는 기타 에러 시 자동으로 채팅으로 이동
+				if (error && typeof error === 'object' && 'response' in error) {
+					const axiosError = error as { response?: { status?: number } }
+					if (
+						axiosError.response?.status === 429 ||
+						(axiosError.response?.status && axiosError.response.status >= 500)
+					) {
+						alert('도서 검색 서비스가 일시적으로 제한되었습니다.\nAI와 직접 토론을 시작합니다!')
+						router.push(`/chat?query=${encodeURIComponent(query)}`)
+					} else {
+						alert('도서 검색에 실패했습니다')
+					}
+				} else {
+					alert('도서 검색에 실패했습니다')
+				}
+			} finally {
+				setLoading(false)
+				isPending.current = false
 			}
-		} finally {
-			setLoading(false)
-			isPending.current = false
-		}
-	}
+		},
+		[router]
+	)
 
 	useEffect(() => {
 		if (queryParam) {
 			handleSearch(queryParam)
 		}
-	}, [queryParam])
+	}, [queryParam, handleSearch])
 
 	return (
 		<div className="w-full h-full">

@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo, useEffect, useState } from 'react'
 import { MdOutlineCollectionsBookmark } from 'react-icons/md'
@@ -12,7 +11,7 @@ import { useSession } from 'next-auth/react'
 
 export function NavBar() {
 	const pathname = usePathname()
-	const { data: session, status } = useSession()
+	const { status } = useSession()
 
 	const [reviewCount, setReviewCount] = useState(0)
 
