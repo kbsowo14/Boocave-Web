@@ -40,9 +40,16 @@ function SearchContent() {
 		try {
 			const response = await axios.get(`/api/books/search?q=${encodeURIComponent(query)}`)
 			setBooks(response.data.books)
-		} catch (error) {
+		} catch (error: any) {
 			console.error('검색 오류:', error)
-			alert('도서 검색에 실패했습니다')
+
+			// API 제한 에러 (429) 또는 기타 에러 시 자동으로 채팅으로 이동
+			if (error.response?.status === 429 || error.response?.status >= 500) {
+				alert('도서 검색 서비스가 일시적으로 제한되었습니다.\nAI와 직접 토론을 시작합니다!')
+				router.push(`/chat?query=${encodeURIComponent(query)}`)
+			} else {
+				alert('도서 검색에 실패했습니다')
+			}
 		} finally {
 			setLoading(false)
 			isPending.current = false

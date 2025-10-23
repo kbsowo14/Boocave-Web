@@ -27,12 +27,15 @@ type Message = {
 function ChatContent() {
 	const searchParams = useSearchParams()
 	const bookGoogleId = searchParams?.get('bookGoogleId') || ''
+	const queryParam = searchParams?.get('query') || ''
 	const router = useRouter()
 
 	const [currentBookInfo, setCurrentBookInfo] = useState<Book | null>(null)
 	const [messages, setMessages] = useState<Message[]>([])
 	const [loading, setLoading] = useState(false)
 	const [isSaving, setIsSaving] = useState(false)
+	const [showBookTitleModal, setShowBookTitleModal] = useState(false)
+	const [bookTitle, setBookTitle] = useState('')
 
 	const searchBookInfo = async (bookGoogleId: string) => {
 		try {
@@ -113,8 +116,9 @@ function ChatContent() {
 			return
 		}
 
+		// 책 정보가 없으면 제목 입력 모달 표시
 		if (!currentBookInfo) {
-			alert('책 정보를 불러오는 중입니다')
+			setShowBookTitleModal(true)
 			return
 		}
 
@@ -122,20 +126,24 @@ function ChatContent() {
 			return
 		}
 
+		await saveReview(currentBookInfo)
+	}
+
+	const saveReview = async (bookInfo: Book) => {
 		setIsSaving(true)
 
 		try {
 			// 1. 대화 내용 요약 및 별점 분석
 			const summaryResponse = await axios.post('/api/chat/summarize', {
 				messages,
-				bookInfo: currentBookInfo,
+				bookInfo,
 			})
 
 			const { rating, review } = summaryResponse.data
 
 			// 2. AI가 분석한 별점과 요약된 리뷰 저장
 			await axios.post('/api/reviews', {
-				bookData: currentBookInfo,
+				bookData: bookInfo,
 				rating, // AI가 대화 내용을 분석하여 결정한 별점
 				review,
 			})
@@ -150,11 +158,41 @@ function ChatContent() {
 		}
 	}
 
+	const handleBookTitleSubmit = async (bookTitle: string) => {
+		if (!bookTitle.trim()) {
+			alert('책 제목을 입력해주세요')
+			return
+		}
+
+		// 임시 책 정보 생성
+		const tempBookInfo: Book = {
+			googleId: `temp_${Date.now()}`, // 임시 ID
+			title: bookTitle.trim(),
+			author: '작자 미상',
+			publisher: '',
+			publishedDate: '',
+			description: '',
+			thumbnail: '',
+			isbn: '',
+		}
+
+		setShowBookTitleModal(false)
+		await saveReview(tempBookInfo)
+	}
+
 	useEffect(() => {
 		if (bookGoogleId) {
 			searchBookInfo(bookGoogleId)
+		} else if (queryParam) {
+			// query 파라미터가 있으면 책 정보 없이 토론 시작
+			// AI에게 책에 대한 정보를 요청하는 첫 메시지 전송
+			const initialMessage = {
+				role: 'assistant' as const,
+				content: `안녕하세요! "${queryParam}"에 대해 이야기해 볼까요?`,
+			}
+			setMessages([initialMessage])
 		}
-	}, [bookGoogleId])
+	}, [bookGoogleId, queryParam])
 
 	return (
 		<div className="w-full relative">
@@ -188,6 +226,41 @@ function ChatContent() {
 				)}
 				<ChatInput onSend={sendMessage} disabled={loading || isSaving} />
 			</div>
+
+			{/* 책 제목 입력 모달 */}
+			{showBookTitleModal && (
+				<div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
+					<div className="bg-[#222222] rounded-lg p-6 w-80">
+						<h3 className="text-white text-lg font-bold mb-4">책 제목을 입력해주세요</h3>
+						<input
+							type="text"
+							value={bookTitle}
+							onChange={e => setBookTitle(e.target.value)}
+							placeholder="예: 백화점"
+							className="w-full px-4 py-3 text-white border border-gray-300 rounded-lg focus:outline-none focus:border-[#51CD42] bg-[#333333] mb-4"
+							onKeyPress={e => {
+								if (e.key === 'Enter') {
+									handleBookTitleSubmit(bookTitle)
+								}
+							}}
+						/>
+						<div className="flex gap-2">
+							<button
+								onClick={() => setShowBookTitleModal(false)}
+								className="flex-1 px-4 py-2 text-gray-400 border border-gray-600 rounded-lg hover:bg-gray-700"
+							>
+								취소
+							</button>
+							<button
+								onClick={() => handleBookTitleSubmit(bookTitle)}
+								className="flex-1 px-4 py-2 bg-[#51CD42] text-white rounded-lg hover:bg-[#45b838]"
+							>
+								저장
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	)
 }
