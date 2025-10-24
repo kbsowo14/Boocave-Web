@@ -34,7 +34,7 @@ export default function ChatInput({ onSend, disabled = false }: ChatInputProps) 
 				onKeyPress={handleKeyPress}
 				placeholder="토론을 시작해보세요"
 				disabled={disabled}
-				className="flex-1 px-4 py-3 text-white border border-gray-300 rounded-full focus:outline-none focus:border-[#51CD42] focus:shadow-[0_0_10px_0_rgba(81,205,66,0.5)] w-full disabled:opacity-50 disabled:cursor-not-allowed bg-[#171717]"
+				className="flex-1 pl-4 pr-12 py-3 text-white border border-gray-300 rounded-full focus:outline-none focus:border-[#51CD42] focus:shadow-[0_0_10px_0_rgba(81,205,66,0.5)] w-full disabled:opacity-50 disabled:cursor-not-allowed bg-[#171717]"
 			/>
 			<button
 				onClick={handleSendMessage}

@@ -19,6 +19,8 @@ export default function MyLibrary() {
 	const [reviews, setReviews] = useState<BookReview[]>([])
 	const [loading, setLoading] = useState(true)
 	const [editingReview, setEditingReview] = useState<BookReview | null>(null)
+	const [isEditing, setIsEditing] = useState(false)
+	const [editReview, setEditReview] = useState('')
 
 	useEffect(() => {
 		if (status === 'unauthenticated') {
@@ -31,6 +33,14 @@ export default function MyLibrary() {
 			fetchReviews()
 		}
 	}, [session])
+
+	// 편집할 리뷰가 변경될 때 편집 상태 초기화
+	useEffect(() => {
+		if (editingReview) {
+			setIsEditing(false)
+			setEditReview('')
+		}
+	}, [editingReview])
 
 	const fetchReviews = async () => {
 		try {
@@ -55,6 +65,56 @@ export default function MyLibrary() {
 		} catch (error) {
 			console.error('삭제 오류:', error)
 			alert('삭제에 실패했습니다')
+		}
+	}
+
+	const handleEdit = () => {
+		if (editingReview) {
+			console.log('편집할 리뷰:', editingReview)
+			console.log('리뷰 내용:', editingReview.review)
+			setEditReview(editingReview.review || '')
+			setIsEditing(true)
+		}
+	}
+
+	const handleCancelEdit = () => {
+		setIsEditing(false)
+		setEditReview('')
+	}
+
+	/**
+	 * @description
+	 * 리뷰 수정 핸들러
+	 */
+	const handleSaveEdit = async () => {
+		if (!editingReview?.id) return
+
+		try {
+			await axios.patch(`/api/reviews/${editingReview.id}`, {
+				rating: editingReview.rating, // 기존 평점 유지
+				review: editReview,
+			})
+
+			// 로컬 상태 업데이트 (리뷰 내용만 업데이트)
+			setReviews(
+				reviews.map(r =>
+					r.id === editingReview.id
+						? {
+								...r,
+								review: editReview,
+							}
+						: r
+				)
+			)
+
+			alert('수정이 완료되었어요!')
+			setIsEditing(false)
+			setEditReview('')
+			setEditingReview(null)
+			router.refresh()
+		} catch (error) {
+			console.error('리뷰 수정 오류:', error)
+			alert('리뷰 수정에 실패했어요!')
 		}
 	}
 
@@ -142,16 +202,41 @@ export default function MyLibrary() {
 										{editingReview?.book?.title || ''}
 									</p>
 								</div>
-								<button
-									className="flex"
-									onClick={() => {
-										if (!!editingReview?.id) {
-											handleDelete(editingReview?.id)
-										}
-									}}
-								>
-									<MdDeleteOutline size={22} color="#C3C3C3" />
-								</button>
+								<div className="flex gap-2">
+									{!isEditing ? (
+										<button
+											className="px-3 py-1 text-sm bg-[#51CD42] text-white rounded hover:bg-green-600 transition-colors"
+											onClick={handleEdit}
+										>
+											편집
+										</button>
+									) : (
+										<>
+											<button
+												className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+												onClick={handleCancelEdit}
+											>
+												취소
+											</button>
+											<button
+												className="px-3 py-1 text-sm bg-[#51CD42] text-white rounded hover:bg-green-600 transition-colors"
+												onClick={handleSaveEdit}
+											>
+												저장
+											</button>
+										</>
+									)}
+									<button
+										className="flex"
+										onClick={() => {
+											if (!!editingReview?.id) {
+												handleDelete(editingReview?.id)
+											}
+										}}
+									>
+										<MdDeleteOutline size={22} color="#C3C3C3" />
+									</button>
+								</div>
 							</div>
 
 							{/* 책 정보 */}
@@ -191,11 +276,21 @@ export default function MyLibrary() {
 							{/* 리뷰 */}
 							<div className="mb-6">
 								<h4 className="text-sm font-medium text-gray-700 mb-2">내가 작성한 리뷰</h4>
-								<div className="p-4 bg-gray-50 rounded-lg">
-									<p className="text-gray-800 whitespace-pre-wrap leading-relaxed">
-										{editingReview?.review || ''}
-									</p>
-								</div>
+								{isEditing ? (
+									<textarea
+										value={editReview}
+										onChange={e => setEditReview(e.target.value)}
+										className="w-full p-4 bg-gray-50 rounded-lg border border-gray-200 focus:border-[#51CD42] focus:outline-none resize-none"
+										rows={6}
+										placeholder="리뷰를 작성해주세요..."
+									/>
+								) : (
+									<div className="p-4 bg-gray-50 rounded-lg">
+										<p className="text-gray-800 whitespace-pre-wrap leading-relaxed">
+											{editingReview?.review || ''}
+										</p>
+									</div>
+								)}
 							</div>
 
 							{/* 날짜 */}
@@ -209,7 +304,11 @@ export default function MyLibrary() {
 							</p>
 
 							<button
-								onClick={() => setEditingReview(null)}
+								onClick={() => {
+									setEditingReview(null)
+									setIsEditing(false)
+									setEditReview('')
+								}}
 								className="w-full px-4 py-3 bg-[#51CD42] text-white rounded-lg hover:bg-blue-700 transition-colors"
 							>
 								확인

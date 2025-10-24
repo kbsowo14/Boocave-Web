@@ -8,6 +8,7 @@ import { MdDoNotDisturbAlt } from 'react-icons/md'
 import { LoadingIndicator } from '@/components/LoadingIndicator'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
+import { useModalStore } from '@/stores/useModalStore'
 
 type Book = {
 	googleId: string
@@ -24,11 +25,29 @@ function SearchContent() {
 	const searchParams = useSearchParams()
 	const queryParam = searchParams?.get('query') || ''
 	const router = useRouter()
+	const { open: openModal, close: closeModal } = useModalStore()
 
 	const [books, setBooks] = useState<Book[]>([])
 	const [loading, setLoading] = useState(false)
 
 	const isPending = useRef(false)
+
+	const alertModalContent = (
+		<div className="flex flex-col justify-center items-center w-full">
+			<p className="w-full text-white text-sm text-left font-bold mb-4">
+				AI와 직접 토론을 시작합니다!
+			</p>
+			<button
+				onClick={() => {
+					closeModal()
+					router.push(`/chat?query=${encodeURIComponent(queryParam)}`)
+				}}
+				className="w-full px-4 py-2 bg-[#51CD42] font-bold text-white rounded-lg hover:bg-[#45b838]"
+			>
+				확인
+			</button>
+		</div>
+	)
 
 	const handleSearch = useCallback(
 		async (query: string) => {
@@ -50,27 +69,32 @@ function SearchContent() {
 						axiosError.response?.status === 429 ||
 						(axiosError.response?.status && axiosError.response.status >= 500)
 					) {
-						alert('도서 검색 서비스가 일시적으로 제한되었습니다.\nAI와 직접 토론을 시작합니다!')
-						router.push(`/chat?query=${encodeURIComponent(query)}`)
+						openModal(alertModalContent, {
+							title: '도서 검색 서비스가 일시적으로 제한되었어요!',
+						})
 					} else {
-						alert('도서 검색에 실패했습니다')
+						openModal(alertModalContent, {
+							title: '도서가 조회되지 않아요!',
+						})
 					}
 				} else {
-					alert('도서 검색에 실패했습니다')
+					openModal(alertModalContent, {
+						title: '일시적인 오류로 검색이 실패했어요!',
+					})
 				}
 			} finally {
 				setLoading(false)
 				isPending.current = false
 			}
 		},
-		[router]
+		[openModal, alertModalContent]
 	)
 
 	useEffect(() => {
 		if (queryParam) {
 			handleSearch(queryParam)
 		}
-	}, [queryParam, handleSearch])
+	}, [queryParam])
 
 	return (
 		<div className="w-full h-full">

@@ -4,6 +4,7 @@ import './globals.css'
 import { Providers } from '@/components/Providers'
 
 import GlobalBottomSheet from '@/components/GlobalBottomSheet'
+import GlobalModal from '@/components/GlobalModal'
 import { ConditionalHeaderLayout } from '@/components/ConditionalHeaderLayout'
 import { ConditionalBottomLayout } from '@/components/ConditionalBottomLayout'
 
@@ -37,6 +38,7 @@ export default function RootLayout({
 						<ConditionalBottomLayout />
 					</div>
 					<GlobalBottomSheet />
+					<GlobalModal />
 				</Providers>
 			</body>
 		</html>

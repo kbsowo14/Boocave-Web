@@ -5,11 +5,13 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { BookSearchInput } from '@/components/BookSearchInput'
 import { GiBlackBook } from 'react-icons/gi'
+import { useModalStore } from '@/stores/useModalStore'
 
 export default function Home() {
 	const router = useRouter()
 	const { data: session, status } = useSession()
 	const { name: userName = '' } = session?.user || {}
+	const { open: openModal, close: closeModal } = useModalStore()
 
 	/**
 	 * @description
@@ -20,6 +22,17 @@ export default function Home() {
 			router?.push('/login')
 		}
 	}, [status, router])
+
+	const successModalContent = (
+		<div className="flex flex-col justify-center items-center w-full">
+			<button
+				onClick={() => closeModal()}
+				className="w-full px-4 py-2 bg-[#51CD42] font-bold text-white rounded-lg hover:bg-[#45b838]"
+			>
+				확인
+			</button>
+		</div>
+	)
 
 	if (status !== 'authenticated') return null
 	return (
@@ -33,7 +46,14 @@ export default function Home() {
 				</p>
 
 				{/* 책과 말풍선 애니메이션 */}
-				<div className="flex justify-center items-center mb-8 relative h-20">
+				<div
+					onClick={() => {
+						openModal(successModalContent, {
+							title: '리뷰가 작성되었어요!',
+						})
+					}}
+					className="flex justify-center items-center mb-8 relative h-20"
+				>
 					{/* 왼쪽 말풍선 (초록색) */}
 					<div className="absolute left-1/2 ml-8 mb-4 animate-bubble-left">
 						<div className="bg-[#51CD42] text-white text-xs px-3 py-2 rounded-2xl rounded-bl-none relative">

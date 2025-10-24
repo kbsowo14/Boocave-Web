@@ -3,6 +3,7 @@
 import ChatBookInfo from '@/components/ChatBookInfo'
 import ChatInput from '@/components/ChatInput'
 import ChatMessages from '@/components/ChatMessages'
+import { useModalStore } from '@/stores/useModalStore'
 import axios from 'axios'
 import { useSearchParams, useRouter } from 'next/navigation'
 import React, { useEffect, useState, Suspense } from 'react'
@@ -29,12 +30,12 @@ function ChatContent() {
 	const bookGoogleId = searchParams?.get('bookGoogleId') || ''
 	const queryParam = searchParams?.get('query') || ''
 	const router = useRouter()
+	const { open: openModal, close: closeModal } = useModalStore()
 
 	const [currentBookInfo, setCurrentBookInfo] = useState<Book | null>(null)
 	const [messages, setMessages] = useState<Message[]>([])
 	const [loading, setLoading] = useState(false)
 	const [isSaving, setIsSaving] = useState(false)
-	const [showBookTitleModal, setShowBookTitleModal] = useState(false)
 	const [bookTitle, setBookTitle] = useState('')
 
 	const searchBookInfo = async (bookGoogleId: string) => {
@@ -110,26 +111,18 @@ function ChatContent() {
 		}
 	}
 
-	const handleEndDiscussion = async () => {
-		if (messages.length === 0) {
-			alert('토론 내용이 없습니다')
-			return
-		}
+	const successModalContent = (
+		<div className="flex flex-col justify-center items-center w-full">
+			<button
+				onClick={() => closeModal()}
+				className="w-full px-4 py-2 bg-[#51CD42] font-bold text-white rounded-lg hover:bg-[#45b838]"
+			>
+				확인
+			</button>
+		</div>
+	)
 
-		// 책 정보가 없으면 제목 입력 모달 표시
-		if (!currentBookInfo) {
-			setShowBookTitleModal(true)
-			return
-		}
-
-		if (!confirm('토론을 종료하고 리뷰로 저장하시겠습니까?')) {
-			return
-		}
-
-		await saveReview(currentBookInfo)
-	}
-
-	const saveReview = async (bookInfo: Book) => {
+	const saveReview = async (bookInfo: Book | null) => {
 		setIsSaving(true)
 
 		try {
@@ -148,7 +141,9 @@ function ChatContent() {
 				review,
 			})
 
-			alert(`토론 내용이 리뷰로 저장되었습니다! (별점: ${rating}점)`)
+			openModal(successModalContent, {
+				title: '리뷰가 작성되었어요!',
+			})
 			router.push('/my-library')
 		} catch (error) {
 			console.error('리뷰 저장 오류:', error)
@@ -156,6 +151,43 @@ function ChatContent() {
 		} finally {
 			setIsSaving(false)
 		}
+	}
+
+	const confirmModalContent = (
+		<div className="flex gap-2 w-full">
+			<button
+				onClick={() => closeModal()}
+				className="flex-1 px-4 py-2 text-gray-400 border border-gray-600 font-bold rounded-lg hover:bg-gray-700"
+			>
+				취소
+			</button>
+			<button
+				onClick={() => {
+					closeModal()
+					saveReview(currentBookInfo)
+				}}
+				className="flex-1 px-4 py-2 bg-[#51CD42] font-bold text-white rounded-lg hover:bg-[#45b838]"
+			>
+				저장
+			</button>
+		</div>
+	)
+
+	const handleEndDiscussion = () => {
+		if (messages.length === 0) {
+			alert('토론 내용이 없습니다')
+			return
+		}
+
+		// 책 정보가 없으면 제목 입력 모달 표시
+		if (!currentBookInfo) {
+			showBookTitleModal()
+			return
+		}
+
+		openModal(confirmModalContent, {
+			title: '대화를 종료하고 리뷰로 저장할까요?',
+		})
 	}
 
 	const handleBookTitleSubmit = async (bookTitle: string) => {
@@ -176,8 +208,45 @@ function ChatContent() {
 			isbn: '',
 		}
 
-		setShowBookTitleModal(false)
+		closeModal()
 		await saveReview(tempBookInfo)
+	}
+
+	const showBookTitleModal = () => {
+		const modalContent = (
+			<>
+				<input
+					type="text"
+					value={bookTitle}
+					onChange={e => setBookTitle(e.target.value)}
+					placeholder="예: 백화점"
+					className="w-full px-4 py-3 text-white border border-gray-300 rounded-lg focus:outline-none focus:border-[#51CD42] bg-[#333333] mb-4"
+					onKeyPress={e => {
+						if (e.key === 'Enter') {
+							handleBookTitleSubmit(bookTitle)
+						}
+					}}
+				/>
+				<div className="flex gap-2">
+					<button
+						onClick={() => closeModal()}
+						className="flex-1 px-4 py-2 text-gray-400 border border-gray-600 rounded-lg hover:bg-gray-700"
+					>
+						취소
+					</button>
+					<button
+						onClick={() => handleBookTitleSubmit(bookTitle)}
+						className="flex-1 px-4 py-2 bg-[#51CD42] text-white rounded-lg hover:bg-[#45b838]"
+					>
+						저장
+					</button>
+				</div>
+			</>
+		)
+
+		openModal(modalContent, {
+			title: '책 제목을 입력해주세요',
+		})
 	}
 
 	useEffect(() => {
@@ -226,41 +295,6 @@ function ChatContent() {
 				)}
 				<ChatInput onSend={sendMessage} disabled={loading || isSaving} />
 			</div>
-
-			{/* 책 제목 입력 모달 */}
-			{showBookTitleModal && (
-				<div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
-					<div className="bg-[#222222] rounded-lg p-6 w-80">
-						<h3 className="text-white text-lg font-bold mb-4">책 제목을 입력해주세요</h3>
-						<input
-							type="text"
-							value={bookTitle}
-							onChange={e => setBookTitle(e.target.value)}
-							placeholder="예: 백화점"
-							className="w-full px-4 py-3 text-white border border-gray-300 rounded-lg focus:outline-none focus:border-[#51CD42] bg-[#333333] mb-4"
-							onKeyPress={e => {
-								if (e.key === 'Enter') {
-									handleBookTitleSubmit(bookTitle)
-								}
-							}}
-						/>
-						<div className="flex gap-2">
-							<button
-								onClick={() => setShowBookTitleModal(false)}
-								className="flex-1 px-4 py-2 text-gray-400 border border-gray-600 rounded-lg hover:bg-gray-700"
-							>
-								취소
-							</button>
-							<button
-								onClick={() => handleBookTitleSubmit(bookTitle)}
-								className="flex-1 px-4 py-2 bg-[#51CD42] text-white rounded-lg hover:bg-[#45b838]"
-							>
-								저장
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
 		</div>
 	)
 }

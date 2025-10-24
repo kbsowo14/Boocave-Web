@@ -1,5 +1,6 @@
 'use client'
 
+import { useModalStore } from '@/stores/useModalStore'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -13,6 +14,18 @@ import { RxPencil1 } from 'react-icons/rx'
 export function Header() {
 	const { data: session } = useSession()
 	const { image: userImage = '' } = session?.user || {}
+	const { open: openModal, close: closeModal } = useModalStore()
+
+	const notificationModalContent = (
+		<div className="flex flex-col justify-center items-center w-full">
+			<button
+				onClick={() => closeModal()}
+				className="w-full px-4 py-2 bg-[#51CD42] font-bold text-white rounded-lg hover:bg-[#45b838]"
+			>
+				확인
+			</button>
+		</div>
+	)
 
 	return (
 		<>
@@ -34,7 +47,10 @@ export function Header() {
 						>
 							{!!userImage && <Image src={userImage} alt="user-image" width={24} height={24} />}
 						</Link>
-						<div className="text-white" onClick={() => alert('준비중 입니다...')}>
+						<div
+							className="text-white"
+							onClick={() => openModal(notificationModalContent, { title: '준비중 입니다...' })}
+						>
 							<FaRegBell size={20} color="#fff" />
 						</div>
 					</div>
