@@ -74,7 +74,7 @@ export function NavBar() {
 
 	return (
 		<>
-			<div className="fixed bottom-0 left-0 right-0 bg-[#333333] flex flex-row justify-around items-center py-2 border-t-[1px] border-[#444444]">
+			<div className="fixed bottom-0 left-0 right-0 max-w-[720px] w-full mx-auto bg-[#333333] flex flex-row justify-around items-center py-2 border-t-[1px] border-[#444444]">
 				{navItems?.map(({ icon, label, href, isBeta = false, count = 0 }, index) => (
 					<Link
 						href={href}

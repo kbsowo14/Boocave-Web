@@ -29,7 +29,7 @@ export function Header() {
 
 	return (
 		<>
-			<header className="fixed top-0 z-10 border-b-[1px] border-[#222222] bg-[#171717] h-16 w-full flex justify-center items-center px-4">
+			<header className="fixed top-0 left-0 right-0 max-w-[720px] mx-auto z-10 border-b-[1px] border-[#222222] bg-[#171717] h-16 flex justify-center items-center px-4">
 				<div className="flex flex-row justify-between items-center w-full">
 					<Link
 						href="/"

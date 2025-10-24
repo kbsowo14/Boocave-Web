@@ -32,13 +32,16 @@ export default function RootLayout({
 		<html lang="ko">
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#171717]`}>
 				<Providers>
-					<div className="w-full min-h-[100vh] py-16 flex flex-col justify-center items-center">
-						<ConditionalHeaderLayout />
-						{children}
-						<ConditionalBottomLayout />
+					<div className="bg-black w-full h-full">
+						<div></div>
+						<div className="max-w-[720px] w-full mx-auto min-h-[100vh] py-16 flex flex-col justify-center items-center relative bg-[#171717]">
+							<ConditionalHeaderLayout />
+							{children}
+							<ConditionalBottomLayout />
+						</div>
+						<GlobalBottomSheet />
+						<GlobalModal />
 					</div>
-					<GlobalBottomSheet />
-					<GlobalModal />
 				</Providers>
 			</body>
 		</html>
