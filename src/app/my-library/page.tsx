@@ -10,11 +10,13 @@ import { MdOutlineImageNotSupported } from 'react-icons/md'
 import { BookReview } from '@/types/book'
 import { MdDeleteOutline } from 'react-icons/md'
 import { useScreenSize } from '@/contexts/DeviceContext'
+import { useToastStore } from '@/stores/useToastStore'
 
 export default function MyLibrary() {
 	const { data: session, status } = useSession()
 	const router = useRouter()
 	const { windowWidth = 0 } = useScreenSize()
+	const { showToast } = useToastStore()
 
 	const [reviews, setReviews] = useState<BookReview[]>([])
 	const [loading, setLoading] = useState(true)
@@ -59,12 +61,12 @@ export default function MyLibrary() {
 		try {
 			await axios.delete(`/api/reviews/${reviewId}`)
 			setReviews(reviews.filter(r => r.id !== reviewId))
-			alert('삭제되었습니다')
+			showToast('삭제되었습니다')
 			setEditingReview(null)
 			router.refresh()
 		} catch (error) {
 			console.error('삭제 오류:', error)
-			alert('삭제에 실패했습니다')
+			showToast('삭제에 실패했습니다')
 		}
 	}
 
@@ -107,14 +109,14 @@ export default function MyLibrary() {
 				)
 			)
 
-			alert('수정이 완료되었어요!')
+			showToast('수정이 완료되었어요!')
 			setIsEditing(false)
 			setEditReview('')
 			setEditingReview(null)
 			router.refresh()
 		} catch (error) {
 			console.error('리뷰 수정 오류:', error)
-			alert('리뷰 수정에 실패했어요!')
+			showToast('리뷰 수정에 실패했어요!')
 		}
 	}
 
@@ -190,119 +192,124 @@ export default function MyLibrary() {
 			{/* 상세보기 모달 */}
 			{editingReview && (
 				<div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-					<div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-						<div className="p-6">
-							{/* 헤더 */}
-							<div className="flex flex-row justify-between items-center mb-6">
-								<div
-									className="flex flex-row justify-start items-center"
-									style={{ maxWidth: windowWidth - 102 - 16 }}
-								>
-									<p className="text-xl font-bold text-gray-900 truncate">
+					<div className="rounded-xl max-w-2xl w-full max-h-[90vh] bg-white flex flex-col">
+						{/* 스크롤 가능한 콘텐츠 영역 */}
+						<div className="flex-1 overflow-y-auto">
+							<div className="p-6 pb-0">
+								{/* 헤더 */}
+								<div className="flex flex-row justify-between items-center mb-6">
+									{/* Title */}
+									<p className="text-xl font-bold text-gray-900 truncate pr-1">
 										{editingReview?.book?.title || ''}
 									</p>
+
+									{/* Buttons */}
+									<div className="flex flex-row justify-end items-center gap-2">
+										{!isEditing ? (
+											<>
+												<button
+													className="break-keep py-1 px-3 text-sm bg-[#51CD42] text-white rounded hover:bg-green-600 transition-colors"
+													onClick={handleEdit}
+												>
+													편집
+												</button>
+												<button
+													onClick={() => {
+														if (!!editingReview?.id) {
+															handleDelete(editingReview?.id)
+														}
+													}}
+												>
+													<MdDeleteOutline size={22} color="#C3C3C3" />
+												</button>
+											</>
+										) : (
+											<>
+												<button
+													className="break-keep px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+													onClick={handleCancelEdit}
+												>
+													취소
+												</button>
+												<button
+													className="break-keep px-3 py-1 text-sm bg-[#51CD42] text-white rounded hover:bg-green-600 transition-colors"
+													onClick={handleSaveEdit}
+												>
+													저장
+												</button>
+											</>
+										)}
+									</div>
 								</div>
-								<div className="flex gap-2">
-									{!isEditing ? (
-										<button
-											className="px-3 py-1 text-sm bg-[#51CD42] text-white rounded hover:bg-green-600 transition-colors"
-											onClick={handleEdit}
-										>
-											편집
-										</button>
+
+								{/* 책 정보 */}
+								<div className="flex gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+									{editingReview?.book?.thumbnail ? (
+										<Image
+											src={editingReview.book.thumbnail}
+											alt={editingReview.book.title || ''}
+											className="object-contain rounded"
+											width={96}
+											height={128}
+										/>
 									) : (
-										<>
-											<button
-												className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
-												onClick={handleCancelEdit}
-											>
-												취소
-											</button>
-											<button
-												className="px-3 py-1 text-sm bg-[#51CD42] text-white rounded hover:bg-green-600 transition-colors"
-												onClick={handleSaveEdit}
-											>
-												저장
-											</button>
-										</>
+										<div className="w-24 h-32 bg-gray-200 rounded flex items-center justify-center">
+											<span className="text-4xl">📖</span>
+										</div>
 									)}
-									<button
-										className="flex"
-										onClick={() => {
-											if (!!editingReview?.id) {
-												handleDelete(editingReview?.id)
-											}
-										}}
-									>
-										<MdDeleteOutline size={22} color="#C3C3C3" />
-									</button>
-								</div>
-							</div>
-
-							{/* 책 정보 */}
-							<div className="flex gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
-								{editingReview?.book?.thumbnail ? (
-									<Image
-										src={editingReview.book.thumbnail}
-										alt={editingReview.book.title || ''}
-										className="object-contain rounded"
-										width={96}
-										height={128}
-									/>
-								) : (
-									<div className="w-24 h-32 bg-gray-200 rounded flex items-center justify-center">
-										<span className="text-4xl">📖</span>
-									</div>
-								)}
-								<div className="flex-1">
-									<h3 className="text-lg font-semibold text-gray-900 mb-1">
-										{editingReview?.book?.title || ''}
-									</h3>
-									<p className="text-sm text-gray-600">{editingReview?.book?.author || ''}</p>
-									<p className="text-xs text-gray-500 mt-1">
-										{editingReview?.book?.publisher || ''} ·{' '}
-										{editingReview?.book?.publishedDate?.substring(0, 4)}
-									</p>
-									<div className="flex items-center mt-3">
-										{[1, 2, 3, 4, 5].map(star => (
-											<span key={star} className="text-2xl">
-												{star <= (editingReview?.rating || 0) ? '★' : '☆'}
-											</span>
-										))}
-									</div>
-								</div>
-							</div>
-
-							{/* 리뷰 */}
-							<div className="mb-6">
-								<h4 className="text-sm font-medium text-gray-700 mb-2">내가 작성한 리뷰</h4>
-								{isEditing ? (
-									<textarea
-										value={editReview}
-										onChange={e => setEditReview(e.target.value)}
-										className="w-full p-4 bg-gray-50 rounded-lg border border-gray-200 focus:border-[#51CD42] focus:outline-none resize-none"
-										rows={6}
-										placeholder="리뷰를 작성해주세요..."
-									/>
-								) : (
-									<div className="p-4 bg-gray-50 rounded-lg">
-										<p className="text-gray-800 whitespace-pre-wrap leading-relaxed">
-											{editingReview?.review || ''}
+									<div className="flex-1">
+										<h3 className="text-lg font-semibold text-gray-900 mb-1">
+											{editingReview?.book?.title || ''}
+										</h3>
+										<p className="text-sm text-gray-600">{editingReview?.book?.author || ''}</p>
+										<p className="text-xs text-gray-500 mt-1">
+											{editingReview?.book?.publisher || ''} ·{' '}
+											{editingReview?.book?.publishedDate?.substring(0, 4)}
 										</p>
+										<div className="flex items-center mt-3">
+											{[1, 2, 3, 4, 5].map(star => (
+												<span key={star} className="text-2xl">
+													{star <= (editingReview?.rating || 0) ? '★' : '☆'}
+												</span>
+											))}
+										</div>
 									</div>
-								)}
+								</div>
+
+								{/* 리뷰 */}
+								<div className="mb-6">
+									<h4 className="text-sm font-medium text-gray-700 mb-2">내가 작성한 리뷰</h4>
+									{isEditing ? (
+										<textarea
+											value={editReview}
+											onChange={e => setEditReview(e.target.value)}
+											className="w-full p-4 bg-gray-50 rounded-lg border border-gray-200 focus:border-[#51CD42] focus:outline-none resize-none"
+											rows={6}
+											placeholder="리뷰를 작성해주세요..."
+										/>
+									) : (
+										<div className="p-4 bg-gray-50 rounded-lg">
+											<p className="text-gray-800 whitespace-pre-wrap leading-relaxed">
+												{editingReview?.review || ''}
+											</p>
+										</div>
+									)}
+								</div>
+
+								{/* 날짜 */}
+								<p className="text-sm text-gray-500 mb-6">
+									작성일:{' '}
+									{new Date(editingReview?.createdAt || '').toLocaleDateString('ko-KR', {
+										year: 'numeric',
+										month: 'long',
+										day: 'numeric',
+									})}
+								</p>
 							</div>
+						</div>
 
-							{/* 날짜 */}
-							<p className="text-sm text-gray-500 mb-6">
-								작성일:{' '}
-								{new Date(editingReview?.createdAt || '').toLocaleDateString('ko-KR', {
-									year: 'numeric',
-									month: 'long',
-									day: 'numeric',
-								})}
-							</p>
-
+						{/* 고정된 하단 버튼 */}
+						<div className="p-6 pt-0">
 							<button
 								onClick={() => {
 									setEditingReview(null)

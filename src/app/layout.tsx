@@ -7,6 +7,7 @@ import GlobalBottomSheet from '@/components/GlobalBottomSheet'
 import GlobalModal from '@/components/GlobalModal'
 import { ConditionalHeaderLayout } from '@/components/ConditionalHeaderLayout'
 import { ConditionalBottomLayout } from '@/components/ConditionalBottomLayout'
+import GlobalToast from '@/components/GlobalToast'
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -41,6 +42,7 @@ export default function RootLayout({
 						</div>
 						<GlobalBottomSheet />
 						<GlobalModal />
+						<GlobalToast />
 					</div>
 				</Providers>
 			</body>
