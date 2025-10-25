@@ -283,7 +283,7 @@ export default function MyLibrary() {
 										<textarea
 											value={editReview}
 											onChange={e => setEditReview(e.target.value)}
-											className="w-full p-4 bg-gray-50 rounded-lg border border-gray-200 focus:border-[#51CD42] focus:outline-none resize-none"
+											className="w-full p-4 bg-gray-50 rounded-lg border border-gray-200 focus:border-[#51CD42] focus:outline-none resize-none text-gray-900"
 											rows={6}
 											placeholder="리뷰를 작성해주세요..."
 										/>
