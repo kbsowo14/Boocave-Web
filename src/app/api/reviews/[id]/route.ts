@@ -20,7 +20,7 @@ export async function PATCH(request: NextRequest, context: Params) {
 
 		const { id } = await context.params
 		const body = await request.json()
-		const { rating, review } = body
+		const { review } = body
 
 		// 리뷰가 존재하고 본인의 리뷰인지 확인
 		const existingReview = await prisma.bookReview.findUnique({
@@ -39,7 +39,6 @@ export async function PATCH(request: NextRequest, context: Params) {
 		const updatedReview = await prisma.bookReview.update({
 			where: { id },
 			data: {
-				rating,
 				review,
 			},
 			include: {

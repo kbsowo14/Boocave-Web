@@ -9,13 +9,11 @@ import { LoadingIndicator } from '@/components/LoadingIndicator'
 import { MdOutlineImageNotSupported } from 'react-icons/md'
 import { BookReview } from '@/types/book'
 import { MdDeleteOutline } from 'react-icons/md'
-import { useScreenSize } from '@/contexts/DeviceContext'
 import { useToastStore } from '@/stores/useToastStore'
 
 export default function MyLibrary() {
 	const { data: session, status } = useSession()
 	const router = useRouter()
-	const { windowWidth = 0 } = useScreenSize()
 	const { showToast } = useToastStore()
 
 	const [reviews, setReviews] = useState<BookReview[]>([])
@@ -74,6 +72,7 @@ export default function MyLibrary() {
 		if (editingReview) {
 			console.log('편집할 리뷰:', editingReview)
 			console.log('리뷰 내용:', editingReview.review)
+			console.log('현재 평점:', editingReview.rating)
 			setEditReview(editingReview.review || '')
 			setIsEditing(true)
 		}
@@ -93,7 +92,6 @@ export default function MyLibrary() {
 
 		try {
 			await axios.patch(`/api/reviews/${editingReview.id}`, {
-				rating: editingReview.rating, // 기존 평점 유지
 				review: editReview,
 			})
 
