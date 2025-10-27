@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { BookSearchInput } from '@/components/BookSearchInput'
 import { GiBlackBook } from 'react-icons/gi'
 import { useModalStore } from '@/stores/useModalStore'
+import { LoadingIndicator } from '@/components/LoadingIndicator'
 
 export default function Home() {
 	const router = useRouter()
@@ -34,7 +35,14 @@ export default function Home() {
 		</div>
 	)
 
-	if (status !== 'authenticated') return null
+	// 페이지 로딩
+	if (status !== 'authenticated')
+		return (
+			<div className="flex justify-center items-center min-h-screen">
+				<LoadingIndicator />
+			</div>
+		)
+
 	return (
 		<div className="w-full flex justify-center items-center pb-8">
 			<div className="w-full">
