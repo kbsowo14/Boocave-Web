@@ -280,7 +280,7 @@ function ChatContent() {
 			<ChatMessages messages={messages} loading={loading} />
 
 			{/* Input Area */}
-			<div className="w-full fixed bottom-0 flex flex-col justify-center items-center p-4">
+			<div className="fixed bottom-0 mx-auto w-full max-w-[720px] flex flex-col justify-center items-center p-4">
 				{/* 토론 종료 버튼 */}
 				{messages.length > 1 && !loading && (
 					<div className="w-full flex justify-center pb-4">
