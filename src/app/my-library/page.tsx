@@ -10,6 +10,7 @@ import { MdOutlineImageNotSupported } from 'react-icons/md'
 import { BookReview } from '@/types/book'
 import { MdDeleteOutline } from 'react-icons/md'
 import { useToastStore } from '@/stores/useToastStore'
+import { FaStar } from 'react-icons/fa'
 
 export default function MyLibrary() {
 	const { data: session, status } = useSession()
@@ -162,7 +163,9 @@ export default function MyLibrary() {
 								<div
 									key={index}
 									className="flex rounded-r-lg rounded-l-sm overflow-hidden relative"
-									onClick={() => setEditingReview(review)}
+									onClick={() => {
+										setEditingReview(review)
+									}}
 								>
 									{/* 책 표지 */}
 									{!thumbnail ? (
@@ -264,12 +267,13 @@ export default function MyLibrary() {
 											{editingReview?.book?.publisher || ''} ·{' '}
 											{editingReview?.book?.publishedDate?.substring(0, 4)}
 										</p>
-										<div className="flex items-center mt-3">
-											{[1, 2, 3, 4, 5].map(star => (
-												<span key={star} className="text-2xl">
-													{star <= (editingReview?.rating || 0) ? '★' : '☆'}
-												</span>
-											))}
+										<div className="flex flex-row justify-start items-center mt-2">
+											<FaStar size={16} color="#51CD42" />
+											<span className="text-sm ml-1">
+												{typeof editingReview?.rating === 'number'
+													? editingReview?.rating?.toFixed(1)
+													: '0.0'}
+											</span>
 										</div>
 									</div>
 								</div>
@@ -314,7 +318,7 @@ export default function MyLibrary() {
 									setIsEditing(false)
 									setEditReview('')
 								}}
-								className="w-full px-4 py-3 bg-[#51CD42] text-white rounded-lg hover:bg-blue-700 transition-colors"
+								className="w-full px-4 py-3 bg-[#51CD42] text-white rounded-lg"
 							>
 								확인
 							</button>
