@@ -269,7 +269,7 @@ export default function MyLibrary() {
 										</p>
 										<div className="flex flex-row justify-start items-center mt-2">
 											<FaStar size={16} color="#51CD42" />
-											<span className="text-sm ml-1">
+											<span className="text-sm ml-1 text-gray-900">
 												{typeof editingReview?.rating === 'number'
 													? editingReview?.rating?.toFixed(1)
 													: '0.0'}
