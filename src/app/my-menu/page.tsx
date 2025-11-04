@@ -2,10 +2,12 @@
 
 import { useSession, signIn, signOut } from 'next-auth/react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { FaAngleRight } from 'react-icons/fa'
 
 export default function MyMenu() {
+	const router = useRouter()
 	const { data: session, status } = useSession()
 	const { image: userImage = '', name: userName = '' } = session?.user || {}
 	const [isLoggingOut, setIsLoggingOut] = useState(false)
@@ -24,6 +26,12 @@ export default function MyMenu() {
 					}
 				},
 			},
+			// {
+			// 	label: '환경설정',
+			// 	onPress: () => {
+			// 		router.push('/setting')
+			// 	},
+			// },
 		],
 		[]
 	)
