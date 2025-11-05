@@ -113,7 +113,7 @@ export default function Setting() {
 						label: '자주 묻는 질문',
 						type: 'button',
 						onPress: () => {
-							console.log('자주 묻는 질문 클릭')
+							router.push('/faq')
 						},
 					},
 				],
@@ -129,7 +129,7 @@ export default function Setting() {
 				],
 			},
 		],
-		[isNotificationEnabled, isReviewNotificationEnabled, isCommentNotificationEnabled]
+		[isNotificationEnabled, isReviewNotificationEnabled, isCommentNotificationEnabled, router]
 	)
 
 	return (

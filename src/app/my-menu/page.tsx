@@ -26,12 +26,12 @@ export default function MyMenu() {
 					}
 				},
 			},
-			// {
-			// 	label: '환경설정',
-			// 	onPress: () => {
-			// 		router.push('/setting')
-			// 	},
-			// },
+			{
+				label: '환경설정',
+				onPress: () => {
+					router.push('/setting')
+				},
+			},
 		],
 		[]
 	)
